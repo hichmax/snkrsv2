@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  HIDDEN
+}
+
+enum OrderStatus {
+  NEW
+  REVIEWING
+  CONTACTED
+  CLOSED
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  heroImage   String?
+  accent      String?  @default("Lime Flux")
+  sortOrder   Int      @default(0)
+  isVisible   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  brands      Brand[]
+}
+
+model Brand {
+  id          String         @id @default(cuid())
+  categoryId  String
+  name        String
+  slug        String         @unique
+  description String?
+  imageUrl    String?
+  sortOrder   Int            @default(0)
+  isVisible   Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  category    Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  models      ProductModel[]
+}
+
+model ProductModel {
+  id        String    @id @default(cuid())
+  brandId   String
+  name      String
+  slug      String    @unique
+  story     String?
+  heroImage String?
+  priceHint String?   @default("Prix sur demande")
+  sortOrder Int       @default(0)
+  isVisible Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  brand     Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  products  Product[]
+}
+
+model Product {
+  id                 String        @id @default(cuid())
+  modelId            String
+  name               String
+  color              String?
+  priceText          String?       @default("Prix sur demande")
+  imageUrl           String
+  imageAlt           String?
+  cloudinaryPublicId String?       @unique
+  status             ProductStatus @default(PUBLISHED)
+  isFeatured         Boolean       @default(false)
+  sortOrder          Int           @default(0)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  model              ProductModel  @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  sizes              ProductSize[]
+}
+
+model ProductSize {
+  id          String  @id @default(cuid())
+  productId   String
+  sizeLabel   String
+  isAvailable Boolean @default(true)
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model OrderRequest {
+  id           String             @id @default(cuid())
+  customerName String
+  phone        String?
+  snapchat     String?
+  city         String?
+  note         String?
+  status       OrderStatus        @default(NEW)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  items        OrderRequestItem[]
+}
+
+model OrderRequestItem {
+  id             String       @id @default(cuid())
+  orderRequestId String
+  productId      String?
+  modelName      String
+  productName    String
+  sizeLabel      String?
+  quantity       Int          @default(1)
+  imageUrl       String?
+  orderRequest   OrderRequest @relation(fields: [orderRequestId], references: [id], onDelete: Cascade)
+}

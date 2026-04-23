@@ -1,0 +1,35 @@
+{
+  "name": "sneakers-addict-v2",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "seed": "node prisma/seed.js",
+    "studio": "prisma studio",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "6.19.3",
+    "cloudinary": "2.9.0",
+    "framer-motion": "12.38.0",
+    "lucide-react": "1.8.0",
+    "next": "16.2.4",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "slugify": "1.6.6",
+    "resend": "4.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "prisma": "6.19.3",
+    "tailwindcss": "latest",
+    "typescript": "latest"
+  }
+}
