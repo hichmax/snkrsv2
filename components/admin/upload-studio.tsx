@@ -114,28 +114,33 @@ export function UploadStudio({ categories, brands, models }: Props) {
           }
         },
         prepareUploadParams: async (cb: (params: Record<string, unknown>) => void) => {
-          const response = await fetch("/api/admin/uploads/sign", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              folder: `sneakers-addict/${brandName}/${modelName}`,
-              tags: [brandName, modelName, "sneakers-addict"],
-              uploadPreset: ""
-            })
-          });
+  const response = await fetch("/api/admin/uploads/sign", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      folder: `sneakers-addict/${brandName}/${modelName}`,
+      tags: [brandName, modelName, "sneakers-addict"]
+    })
+  });
 
-          const data = await response.json();
-          cb({
-            apiKey: data.apiKey,
-            signature: data.signature,
-            uploadSignatureTimestamp: data.timestamp,
-            folder: data.folder,
-            tags: data.tags,
-            uploadPreset: data.uploadPreset || undefined
-          });
-        }
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error(data);
+    alert("Impossible de générer la signature Cloudinary.");
+    return;
+  }
+
+  cb({
+    apiKey: data.apiKey,
+    signature: data.signature,
+    uploadSignatureTimestamp: data.timestamp,
+    folder: data.folder,
+    tags: data.tags
+  });
+}
       },
       async (error: unknown, result: any) => {
         if (error) {
