@@ -87,7 +87,6 @@ export function UploadStudio({ categories, brands, models }: Props) {
         sources: ["local", "camera", "url"],
         showAdvancedOptions: false,
         cropping: false,
-        folder: `sneakers-addict/${brandName}/${modelName}`,
         clientAllowedFormats: ["png", "jpg", "jpeg", "webp"],
         styles: {
           palette: {
@@ -113,16 +112,24 @@ export function UploadStudio({ categories, brands, models }: Props) {
             }
           }
         },
-        prepareUploadParams: async (cb: (params: Record<string, unknown>) => void) => {
+        prepareUploadParams: async (
+  cb: (params: Record<string, unknown>) => void,
+  params: Record<string, unknown>
+) => {
+  const paramsToSign = {
+    ...params,
+    folder: `sneakers-addict/${brandName}/${modelName}`,
+    tags: [brandName, modelName, "sneakers-addict"].join(","),
+  };
+
   const response = await fetch("/api/admin/uploads/sign", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      folder: `sneakers-addict/${brandName}/${modelName}`,
-      tags: [brandName, modelName, "sneakers-addict"]
-    })
+      paramsToSign,
+    }),
   });
 
   const data = await response.json();
@@ -134,11 +141,9 @@ export function UploadStudio({ categories, brands, models }: Props) {
   }
 
   cb({
+    ...paramsToSign,
     apiKey: data.apiKey,
     signature: data.signature,
-    uploadSignatureTimestamp: data.timestamp,
-    folder: data.folder,
-    tags: data.tags
   });
 }
       },
