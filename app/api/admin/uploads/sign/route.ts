@@ -1,6 +1,24 @@
 import { NextResponse } from "next/server";
 import { assertAdminApi } from "@/lib/auth";
-import { cloudinaryEnv, signCloudinaryParams } from "@/lib/cloudinary";
+import crypto from "node:crypto";
+
+function signCloudinaryParams(params: Record<string, string>) {
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  if (!apiSecret) {
+    throw new Error("CLOUDINARY_API_SECRET manquant.");
+  }
+
+  const stringToSign = Object.entries(params)
+    .filter(([, value]) => value !== undefined && value !== null && value !== "")
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+
+  return crypto
+    .createHash("sha1")
+    .update(stringToSign + apiSecret)
+    .digest("hex");
+}
 
 export async function POST(request: Request) {
   try {
@@ -20,7 +38,6 @@ export async function POST(request: Request) {
           .filter(Boolean)
       : [];
 
-    const tags = tagsArray.join(",");
     const timestamp = Math.floor(Date.now() / 1000).toString();
 
     const paramsToSign: Record<string, string> = {
@@ -29,24 +46,22 @@ export async function POST(request: Request) {
       timestamp,
     };
 
-    if (tags) {
-      paramsToSign.tags = tags;
+    if (tagsArray.length > 0) {
+      paramsToSign.tags = tagsArray.join(",");
     }
 
     const signature = signCloudinaryParams(paramsToSign);
-    const env = cloudinaryEnv();
 
     return NextResponse.json({
+      apiKey: process.env.CLOUDINARY_API_KEY,
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME,
       signature,
       timestamp,
-      apiKey: env.apiKey,
-      cloudName: env.cloudName,
       folder,
       tags: tagsArray,
     });
   } catch (error) {
     console.error("Cloudinary sign error:", error);
-
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Erreur signature." },
       { status: 500 }
