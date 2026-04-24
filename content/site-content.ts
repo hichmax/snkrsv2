@@ -3,7 +3,7 @@ export const siteContent = {
     name: "Sneakers Addict",
     shortName: "SA",
     headerLabel: "Sneakers Addict",
-    headerTagline: "Sélection premium",
+    headerTagline: "Revendeurs premium",
     footerHeadline: "Sélection premium, nouveautés régulières, commande rapide.",
     footerLines: ["Commande sur demande.", "Livraison et disponibilité communiquées après validation."],
     metadataTitle: "Sneakers Addict",
@@ -11,9 +11,9 @@ export const siteContent = {
   },
   home: {
     badge: "nouvelle sélection",
-    titleLines: ["Sélection premium.", "Visuels soignés.", "Commande simplifiée."],
+    titleLines: ["Catalogue premium", "Sneakers et vêtements", "Commande simplifiée"],
     description:
-      "Découvrez les dernières paires, vêtements et accessoires dans un univers sobre, premium et centré sur le visuel.",
+      "Vous pouvez me retrouver sur mon snap : snkrsaddct. Découvrez les dernières paires, vêtements et accessoires premium ",
     primaryCta: "Explorer le catalogue",
     secondaryCta: "Voir les nouveautés",
     features: [

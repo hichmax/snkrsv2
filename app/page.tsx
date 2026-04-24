@@ -9,12 +9,19 @@ import { Marquee } from "@/components/site/marquee";
 import { siteContent } from "@/content/site-content";
 
 export default async function HomePage() {
+
   const { categories, featured, latest } = await getHomeData();
 
   const nav = categories.slice(0, 4).map((category) => ({
     label: category.name,
     href: `/catalog/${category.slug}`
   }));
+
+  const firstCategoryHref = categories?.[0]
+  ? `/catalog/${categories[0].slug}`
+  : "#catalogue";
+
+  const nouveautésHref = "#nouveautes";
 
   return (
     <main>
@@ -40,22 +47,21 @@ export default async function HomePage() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href={categories[0] ? `/catalog/${categories[0].slug}` : "/catalog"}
-                className="inline-flex items-center gap-2 rounded-full bg-lime-300 px-5 py-3 font-semibold text-black"
-              >
-                {siteContent.home.primaryCta}
-                <ArrowUpRight className="h-4 w-4" />
-              </Link>
-              {latest[0] ? (
-                <Link
-                  href={`/catalog/${latest[0].brand.category.slug}/${latest[0].brand.slug}/${latest[0].slug}`}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-white"
-                >
-                  {siteContent.home.secondaryCta}
-                </Link>
-              ) : null}
-            </div>
+  <a
+    href="#catalogue"
+    className="inline-flex items-center gap-2 rounded-full bg-lime-300 px-5 py-3 font-semibold text-black"
+  >
+    {siteContent.home.primaryCta}
+    <ArrowUpRight className="h-4 w-4" />
+  </a>
+
+  <a
+    href="#nouveautes"
+    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-white"
+  >
+    {siteContent.home.secondaryCta}
+  </a>
+</div>
 
             <div className="mt-10 grid gap-4 md:grid-cols-3">
               {[
@@ -80,7 +86,7 @@ export default async function HomePage() {
               <img
                 src={
                   featured[0]?.imageUrl ||
-                  "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1400&q=80"
+                  "https://i.imgur.com/JWFWh03.jpeg"
                 }
                 alt="Sélection mise en avant"
                 className="h-full w-full object-cover"
@@ -109,7 +115,7 @@ export default async function HomePage() {
 
       <Marquee />
 
-      <section className="px-4 py-12 md:px-8">
+      <section id="catalogue" className="px-4 py-12 md:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
@@ -158,7 +164,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="px-4 pb-16 md:px-8">
+      <section id="nouveautes" className="px-4 pb-16 md:px-8">
         <div className="mx-auto max-w-7xl rounded-[40px] border border-white/10 bg-white/[0.04] p-6 md:p-8">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
