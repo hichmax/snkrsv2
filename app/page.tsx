@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { ArrowUpRight, Sparkles, Layers3, ScanLine, ShoppingBag } from "lucide-react";
+import { ArrowUpRight, Sparkles } from "lucide-react";
 import { getHomeData } from "@/lib/queries";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
@@ -10,18 +10,13 @@ import { siteContent } from "@/content/site-content";
 
 export default async function HomePage() {
 
-  const { categories, featured, latest } = await getHomeData();
+  const { categories, featured } = await getHomeData();
 
   const nav = categories.slice(0, 4).map((category) => ({
     label: category.name,
     href: `/catalog/${category.slug}`
   }));
 
-  const firstCategoryHref = categories?.[0]
-  ? `/catalog/${categories[0].slug}`
-  : "#catalogue";
-
-  const nouveautésHref = "#nouveautes";
 
   return (
     <main>
@@ -47,68 +42,32 @@ export default async function HomePage() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-  <a
-    href="#catalogue"
-    className="inline-flex items-center gap-2 rounded-full bg-lime-300 px-5 py-3 font-semibold text-black"
-  >
-    {siteContent.home.primaryCta}
-    <ArrowUpRight className="h-4 w-4" />
-  </a>
+              <a
+                href="#catalogue"
+                className="inline-flex items-center gap-2 rounded-full bg-lime-300 px-5 py-3 font-semibold text-black"
+              >
+                {siteContent.home.primaryCta}
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
 
-  <a
-    href="#nouveautes"
-    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-white"
-  >
-    {siteContent.home.secondaryCta}
-  </a>
-</div>
-
-            <div className="mt-10 grid gap-4 md:grid-cols-3">
-              {[
-                { icon: Layers3, ...siteContent.home.features[0] },
-                { icon: ScanLine, ...siteContent.home.features[1] },
-                { icon: ShoppingBag, ...siteContent.home.features[2] }
-              ].map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div key={item.title} className="rounded-[28px] border border-white/10 bg-black/30 p-4">
-                    <Icon className="h-5 w-5 text-lime-300" />
-                    <h3 className="mt-4 text-lg font-semibold">{item.title}</h3>
-                    <p className="mt-2 text-sm text-white/55">{item.text}</p>
-                  </div>
-                );
-              })}
+              <a
+                href="#nouveautes"
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-white"
+              >
+                {siteContent.home.secondaryCta}
+              </a>
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-rows-[1fr_1fr]">
-            <div className="overflow-hidden rounded-[32px] border border-white/10 bg-black/35">
-              <img
-                src={
-                  featured[0]?.imageUrl ||
-                  "https://i.imgur.com/JWFWh03.jpeg"
-                }
-                alt="Sélection mise en avant"
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              {latest.slice(0, 2).map((model) => (
-                <Link
-                  key={model.id}
-                  href={`/catalog/${model.brand.category.slug}/${model.brand.slug}/${model.slug}`}
-                  className="rounded-[32px] border border-white/10 bg-white/[0.04] p-4"
-                >
-                  <p className="text-[11px] uppercase tracking-[0.3em] text-white/40">
-                    {model.brand.name}
-                  </p>
-                  <h3 className="mt-3 text-2xl font-semibold">{model.name}</h3>
-                  <p className="mt-3 text-sm text-white/55">
-                    {model._count.products} {siteContent.home.latestProductCountLabel}
-                  </p>
-                </Link>
-              ))}
-            </div>
+          <div className="overflow-hidden rounded-[32px] border border-white/10 bg-black/35">
+            <img
+              src={
+                featured[0]?.imageUrl ||
+                "https://i.imgur.com/JWFWh03.jpeg"
+              }
+              alt="Sélection mise en avant"
+              className="aspect-[4/5] h-full w-full object-cover md:aspect-auto"
+            />
           </div>
         </div>
       </section>

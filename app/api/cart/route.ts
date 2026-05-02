@@ -2,6 +2,44 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { emailClient } from "@/lib/email";
 
+function cleanName(value: unknown) {
+  const raw = typeof value === "string" ? value.trim() : "";
+  if (!raw) return "";
+
+  return decodeURIComponent(raw)
+    .split("/")
+    .pop()!
+    .split("?")[0]
+    .replace(/\.[a-zA-Z0-9]+$/, "")
+    .trim();
+}
+
+function getAdminImageName(input: {
+  modelName: string;
+  productName?: string | null;
+  productDbName?: string | null;
+  cloudinaryPublicId?: string | null;
+  imageUrl?: string | null;
+}) {
+  const modelName = cleanName(input.modelName).toLowerCase();
+  const candidates = [
+    cleanName(input.productDbName),
+    cleanName(input.cloudinaryPublicId),
+    cleanName(input.productName),
+    cleanName(input.imageUrl)
+  ];
+
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    const normalized = candidate.toLowerCase();
+    if (normalized === modelName) continue;
+    if (normalized === "variation" || normalized === "variation photo") continue;
+    return candidate;
+  }
+
+  return cleanName(input.productName) || "Nom image non récupéré";
+}
+
 async function sendOrderNotificationEmail(order: {
   id: string;
   customerName: string;
@@ -56,6 +94,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Nom et panier requis." }, { status: 400 });
     }
 
+    const productIds = items
+      .map((item: any) => (typeof item.productId === "string" ? item.productId : ""))
+      .filter(Boolean);
+
+    const products = productIds.length
+      ? await prisma.product.findMany({
+          where: { id: { in: productIds } },
+          select: {
+            id: true,
+            name: true,
+            cloudinaryPublicId: true,
+            imageUrl: true
+          }
+        })
+      : [];
+
+    const productById = new Map(products.map((product) => [product.id, product]));
+
     const createdOrder = await prisma.orderRequest.create({
       data: {
         customerName,
@@ -64,14 +120,25 @@ export async function POST(request: Request) {
         city: body.city || null,
         note: body.note || null,
         items: {
-          create: items.map((item: any) => ({
-            productId: item.productId || null,
-            modelName: item.modelName || "Modèle",
-            productName: item.productName || "Variation",
-            sizeLabel: item.sizeLabel || null,
-            quantity: Number(item.quantity || 1),
-            imageUrl: item.imageUrl || null
-          }))
+          create: items.map((item: any) => {
+            const product = item.productId ? productById.get(item.productId) : null;
+            const modelName = item.modelName || "Modèle";
+
+            return {
+              productId: item.productId || null,
+              modelName,
+              productName: getAdminImageName({
+                modelName,
+                productName: item.productName,
+                productDbName: product?.name,
+                cloudinaryPublicId: product?.cloudinaryPublicId,
+                imageUrl: product?.imageUrl || item.imageUrl
+              }),
+              sizeLabel: item.sizeLabel || null,
+              quantity: Number(item.quantity || 1),
+              imageUrl: item.imageUrl || product?.imageUrl || null
+            };
+          })
         }
       },
       include: {

@@ -227,7 +227,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "D:\\SNKRS\\VRAISITE\\sneakers-addict-v2\\generated\\prisma",
+      "value": "D:\\SNKRS\\VRAISITE\\snkrsaddctv2copie\\snkrsv2\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -241,7 +241,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "D:\\SNKRS\\VRAISITE\\sneakers-addict-v2\\prisma\\schema.prisma",
+    "sourceFilePath": "D:\\SNKRS\\VRAISITE\\snkrsaddctv2copie\\snkrsv2\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

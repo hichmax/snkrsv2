@@ -25,3 +25,24 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ orderId: string }> }
+) {
+  try {
+    await assertAdminApi();
+    const { orderId } = await params;
+
+    await prisma.orderRequest.delete({
+      where: { id: orderId }
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Erreur suppression commande." },
+      { status: 500 }
+    );
+  }
+}
