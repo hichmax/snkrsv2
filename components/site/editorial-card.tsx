@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ResilientImage } from "@/components/site/resilient-image";
+import { AutoFitText } from "@/components/site/auto-fit-text";
 
 export function EditorialCard({
   href,
@@ -48,7 +49,7 @@ export function EditorialCard({
                 ? "(max-width: 768px) 100vw, 33vw"
                 : "(max-width: 768px) 100vw, 50vw"
             }
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.045]"
+            className="scale-[1.08] object-cover transition-transform duration-700 ease-out group-hover:scale-[1.14]"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
           <div className="absolute right-4 top-4 flex h-11 w-11 translate-y-2 items-center justify-center rounded-full border border-white/15 bg-black/35 opacity-0 backdrop-blur-md transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
@@ -56,9 +57,14 @@ export function EditorialCard({
           </div>
           <div className="editorial-card-caption absolute inset-x-3 bottom-3 p-4 md:inset-x-4 md:bottom-4 md:p-5">
             <p className="eyebrow">{eyebrow}</p>
-            <h3 className="mt-2 text-3xl font-semibold tracking-[-0.04em] md:text-4xl">
+            <AutoFitText
+              as="h3"
+              maxLines={2}
+              minFontSize={20}
+              className="mt-2 text-3xl font-semibold tracking-[-0.04em] md:text-4xl"
+            >
               {title}
-            </h3>
+            </AutoFitText>
             <p className="mt-2 text-sm text-white/55">{meta}</p>
           </div>
         </div>

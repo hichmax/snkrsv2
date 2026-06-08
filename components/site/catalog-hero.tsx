@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { MotionReveal } from "@/components/site/motion-reveal";
 import { ResilientImage } from "@/components/site/resilient-image";
+import { AutoFitText } from "@/components/site/auto-fit-text";
 
 export function CatalogHero({
   eyebrow,
@@ -30,7 +31,9 @@ export function CatalogHero({
           </Link>
           <MotionReveal>
             <p className="eyebrow">{eyebrow}</p>
-            <h1 className="catalog-title mt-4">{title}</h1>
+            <AutoFitText as="h1" className="catalog-title mt-4" maxLines={3} minFontSize={38}>
+              {title}
+            </AutoFitText>
             <div className="catalog-hero-panel mt-7 flex flex-col gap-6 pt-5 md:flex-row md:items-end md:justify-between">
               <p className="max-w-2xl text-sm leading-7 text-white/65 md:text-base">{description}</p>
               <div className="flex flex-wrap gap-2">
@@ -53,7 +56,7 @@ export function CatalogHero({
           fill
           priority
           sizes="100vw"
-          className="object-cover"
+          className="scale-[1.08] object-cover"
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,5,12,.94),rgba(13,22,46,.34))]" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#03050a]/80 via-transparent to-[#24365b]/15" />

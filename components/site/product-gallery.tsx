@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useCart } from "@/components/site/cart-provider";
 import { ProductTile } from "@/components/site/product-tile";
 import { ResilientImage } from "@/components/site/resilient-image";
+import { AutoFitText } from "@/components/site/auto-fit-text";
 
 type GalleryProduct = {
   id: string;
@@ -75,7 +76,7 @@ export function ProductGallery({
                 alt={product.imageAlt || product.modelName}
                 fill
                 sizes="33vw"
-                className="object-cover"
+                className="scale-[1.14] object-cover"
               />
             </motion.div>
             <span className="mobile-product-thumb-glow" />
@@ -134,7 +135,7 @@ export function ProductGallery({
                   fill
                   priority
                   sizes="92vw"
-                  className="object-cover"
+                  className="scale-[1.07] object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-white/[0.08]" />
                 <span className="premium-badge absolute left-4 top-4">
@@ -150,9 +151,14 @@ export function ProductGallery({
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <p className="eyebrow">{selected.color || selected.name}</p>
-                    <h3 className="mt-2 text-2xl font-semibold tracking-[-0.05em]">
+                    <AutoFitText
+                      as="h3"
+                      maxLines={2}
+                      minFontSize={17}
+                      className="mt-2 text-2xl font-semibold tracking-[-0.05em]"
+                    >
                       {selected.modelName}
-                    </h3>
+                    </AutoFitText>
                   </div>
                   <p className="shrink-0 text-sm font-semibold text-[var(--electric)]">
                     {selected.priceText || "Prix sur demande"}
@@ -196,6 +202,7 @@ export function ProductGallery({
                       quantity: 1,
                       imageUrl: selected.imageUrl
                     });
+                    closeProduct();
                     navigator.vibrate?.(14);
                   }}
                   className="liquid-action mt-5 w-full"

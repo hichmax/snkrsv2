@@ -32,7 +32,7 @@ export function HomeHero({
             fill
             priority
             sizes="100vw"
-            className="object-cover"
+            className="scale-[1.06] object-cover"
           />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,5,12,.94)_0%,rgba(3,7,17,.62)_48%,rgba(20,32,62,.12)_100%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(2,4,10,.82)_0%,transparent_55%)]" />

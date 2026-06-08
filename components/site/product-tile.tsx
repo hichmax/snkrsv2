@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Plus, ShoppingBag } from "lucide-react";
 import { useCart } from "@/components/site/cart-provider";
 import { ResilientImage } from "@/components/site/resilient-image";
+import { AutoFitText } from "@/components/site/auto-fit-text";
 
 type SizeItem = {
   id: string;
@@ -44,7 +45,7 @@ export function ProductTile({ product }: ProductTileProps) {
           alt={product.imageAlt || product.modelName}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
-          className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+          className="scale-[1.1] object-cover transition-transform duration-700 ease-out group-hover:scale-[1.16]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/10" />
         <div className="absolute left-3 top-3 flex items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] backdrop-blur-xl">
@@ -79,9 +80,14 @@ export function ProductTile({ product }: ProductTileProps) {
           <p className="truncate text-xs uppercase tracking-[0.2em] text-white/35">
             {product.color || product.name}
           </p>
-          <h3 className="mt-1 truncate text-lg font-semibold tracking-[-0.03em]">
+          <AutoFitText
+            as="h3"
+            maxLines={2}
+            minFontSize={13}
+            className="mt-1 text-lg font-semibold tracking-[-0.03em]"
+          >
             {product.modelName}
-          </h3>
+          </AutoFitText>
           <p className="mt-2 text-sm text-[var(--electric)]">
             {product.priceText || "Prix sur demande"}
           </p>

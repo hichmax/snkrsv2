@@ -62,7 +62,7 @@ export function CartDrawer() {
     <>
       <button
         onClick={() => toggle(true)}
-        className="cart-floating-button fixed bottom-24 right-3 z-50 flex items-center gap-3 rounded-full px-4 py-3 text-sm text-white md:bottom-5 md:right-5"
+        className="cart-floating-button fixed bottom-24 right-3 z-[130] flex items-center gap-3 rounded-full px-4 py-3 text-sm text-white md:bottom-5 md:right-5"
       >
         <ShoppingBag className="h-4 w-4" />
         <span>{siteContent.cart.buttonLabel}</span>
@@ -79,14 +79,14 @@ export function CartDrawer() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => toggle(false)}
-              className="fixed inset-0 z-50 bg-black/55 backdrop-blur-sm"
+              className="cart-drawer-backdrop fixed inset-0 z-[140] bg-black/72"
             />
             <motion.aside
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", stiffness: 260, damping: 28 }}
-              className="liquid-cart-drawer fixed right-0 top-0 z-[60] h-full w-full max-w-xl overflow-y-auto p-5 text-white"
+              className="liquid-cart-drawer fixed right-0 top-0 z-[150] h-full w-full max-w-xl overflow-y-auto p-5 text-white"
             >
               <div className="mb-5 flex items-center justify-between">
                 <div>

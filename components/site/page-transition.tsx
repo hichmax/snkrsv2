@@ -6,15 +6,6 @@ import { useEffect, useRef, useState } from "react";
 
 type Phase = "idle" | "expanding" | "revealing";
 
-const fragments = [
-  { x: -96, y: -76, size: 30, delay: 0 },
-  { x: 82, y: -100, size: 19, delay: 0.03 },
-  { x: 120, y: 36, size: 38, delay: 0.05 },
-  { x: 42, y: 112, size: 22, delay: 0.08 },
-  { x: -82, y: 92, size: 34, delay: 0.1 },
-  { x: -128, y: 16, size: 18, delay: 0.12 }
-];
-
 export function PageTransition() {
   const pathname = usePathname();
   const router = useRouter();
@@ -111,30 +102,6 @@ export function PageTransition() {
             }}
             transition={{ duration: 0.62, ease: [0.2, 0.82, 0.24, 1] }}
           />
-          {fragments.map((fragment, index) => (
-            <motion.span
-              key={index}
-              className="liquid-transition-fragment"
-              style={{
-                left: origin.x,
-                top: origin.y,
-                width: fragment.size,
-                height: fragment.size
-              }}
-              initial={{ x: 0, y: 0, opacity: 0, scale: 0.2 }}
-              animate={{
-                x: fragment.x,
-                y: fragment.y,
-                opacity: phase === "expanding" ? [0, 0.85, 0] : 0,
-                scale: phase === "expanding" ? [0.2, 1, 0.5] : 0.4
-              }}
-              transition={{
-                duration: 0.58,
-                delay: fragment.delay,
-                ease: [0.22, 1, 0.36, 1]
-              }}
-            />
-          ))}
         </motion.div>
       ) : null}
     </AnimatePresence>
