@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, Check, Copy, Grid2X2, Home, Menu, Sparkles, X } from "lucide-react";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 type NavItem = {
   label: string;
@@ -13,12 +14,30 @@ type NavItem = {
 export function SiteHeader({ nav }: { nav: NavItem[] }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [activeDock, setActiveDock] = useState<"home" | "catalogue" | "drop" | "snap">("home");
+  const pathname = usePathname();
   const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (pathname.startsWith("/catalog")) {
+      setActiveDock("catalogue");
+      return;
+    }
+
+    setActiveDock(
+      window.location.hash === "#nouveautes"
+        ? "drop"
+        : window.location.hash === "#catalogue"
+          ? "catalogue"
+          : "home"
+    );
+  }, [pathname]);
 
   async function copySnap() {
     await navigator.clipboard?.writeText("snkrsaddct");
     navigator.vibrate?.(10);
     setCopied(true);
+    setActiveDock("snap");
     setTimeout(() => setCopied(false), 1600);
   }
 
@@ -67,22 +86,37 @@ export function SiteHeader({ nav }: { nav: NavItem[] }) {
         </motion.div>
       </header>
 
-      <nav className="mobile-bottom-nav md:hidden" aria-label="Navigation mobile">
-        <Link href="/" className="mobile-bottom-item">
-          <Home className="h-4 w-4" />
-          <span>Accueil</span>
+      <nav className="mobile-bottom-nav" aria-label="Navigation mobile">
+        <Link
+          href="/"
+          onClick={() => setActiveDock("home")}
+          className={`mobile-bottom-item ${activeDock === "home" ? "mobile-bottom-item-active" : ""}`}
+        >
+          <span className="mobile-bottom-icon"><Home /></span>
+          <span className="mobile-bottom-label">Accueil</span>
         </Link>
-        <Link href="/#catalogue" className="mobile-bottom-item">
-          <Grid2X2 className="h-4 w-4" />
-          <span>Catalogue</span>
+        <Link
+          href="/#catalogue"
+          onClick={() => setActiveDock("catalogue")}
+          className={`mobile-bottom-item ${activeDock === "catalogue" ? "mobile-bottom-item-active" : ""}`}
+        >
+          <span className="mobile-bottom-icon"><Grid2X2 /></span>
+          <span className="mobile-bottom-label">Catalogue</span>
         </Link>
-        <Link href="/#nouveautes" className="mobile-bottom-item">
-          <Sparkles className="h-4 w-4" />
-          <span>Drop</span>
+        <Link
+          href="/#nouveautes"
+          onClick={() => setActiveDock("drop")}
+          className={`mobile-bottom-item ${activeDock === "drop" ? "mobile-bottom-item-active" : ""}`}
+        >
+          <span className="mobile-bottom-icon"><Sparkles /></span>
+          <span className="mobile-bottom-label">Drop</span>
         </Link>
-        <button onClick={copySnap} className="mobile-bottom-item">
-          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-          <span>{copied ? "Copié" : "Snap"}</span>
+        <button
+          onClick={copySnap}
+          className={`mobile-bottom-item ${activeDock === "snap" ? "mobile-bottom-item-active" : ""}`}
+        >
+          <span className="mobile-bottom-icon">{copied ? <Check /> : <Copy />}</span>
+          <span className="mobile-bottom-label">{copied ? "Copié" : "Snap"}</span>
         </button>
       </nav>
 
