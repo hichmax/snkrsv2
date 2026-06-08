@@ -1,9 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useState } from "react";
-import { ShoppingBag } from "lucide-react";
+import { Plus, ShoppingBag } from "lucide-react";
 import { useCart } from "@/components/site/cart-provider";
+import { ResilientImage } from "@/components/site/resilient-image";
 
 type SizeItem = {
   id: string;
@@ -25,6 +26,7 @@ type ProductTileProps = {
 };
 
 export function ProductTile({ product }: ProductTileProps) {
+  const reducedMotion = useReducedMotion();
   const [selectedSize, setSelectedSize] = useState<string | undefined>(
     product.sizes.find((size) => size.isAvailable)?.sizeLabel
   );
@@ -32,54 +34,74 @@ export function ProductTile({ product }: ProductTileProps) {
 
   return (
     <motion.article
-      whileHover={{ y: -6 }}
-      className="group overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.04]"
+      whileHover={reducedMotion ? undefined : { y: -7 }}
+      transition={{ duration: 0.3 }}
+      className="product-card group"
     >
       <div className="relative aspect-[4/5] overflow-hidden">
-        <img
+        <ResilientImage
           src={product.imageUrl}
           alt={product.imageAlt || product.modelName}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
-        <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[11px] uppercase tracking-[0.25em] text-white/70 backdrop-blur-md">
-          {product.priceText || "Prix sur demande"}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/10" />
+        <div className="absolute left-3 top-3 flex items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] backdrop-blur-xl">
+          <span className="status-dot" />
+          Disponible
         </div>
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <div className="flex flex-wrap gap-2">
-            {product.sizes.map((size) => (
-              <button
-                key={size.id}
-                onClick={() => size.isAvailable && setSelectedSize(size.sizeLabel)}
-                className={`rounded-full px-3 py-1.5 text-xs ${
-                  selectedSize === size.sizeLabel
-                    ? "bg-lime-300 text-black"
-                    : size.isAvailable
-                    ? "border border-white/10 bg-white/10 text-white"
-                    : "cursor-not-allowed border border-white/5 bg-white/5 text-white/25"
-                }`}
-              >
-                {size.sizeLabel}
-              </button>
-            ))}
+
+        <div className="absolute inset-x-0 bottom-0 p-4">
+          <div className="translate-y-3 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+            <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/45">
+              Choisir une taille
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {product.sizes.map((size) => (
+                <button
+                  key={size.id}
+                  onClick={() => size.isAvailable && setSelectedSize(size.sizeLabel)}
+                  disabled={!size.isAvailable}
+                  className={`size-chip ${
+                    selectedSize === size.sizeLabel ? "size-chip-active" : ""
+                  }`}
+                >
+                  {size.sizeLabel}
+                </button>
+              ))}
+            </div>
           </div>
-          <button
-            onClick={() =>
-              addItem({
-                productId: product.id,
-                modelName: product.modelName,
-                productName: "",
-                sizeLabel: selectedSize,
-                quantity: 1,
-                imageUrl: product.imageUrl
-              })
-            }
-            className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-black"
-          >
-            <ShoppingBag className="h-4 w-4" />
-            Ajouter
-          </button>
         </div>
+      </div>
+      <div className="flex items-end justify-between gap-4 p-4">
+        <div className="min-w-0">
+          <p className="truncate text-xs uppercase tracking-[0.2em] text-white/35">
+            {product.color || product.name}
+          </p>
+          <h3 className="mt-1 truncate text-lg font-semibold tracking-[-0.03em]">
+            {product.modelName}
+          </h3>
+          <p className="mt-2 text-sm text-lime-300">
+            {product.priceText || "Prix sur demande"}
+          </p>
+        </div>
+        <button
+          onClick={() =>
+            addItem({
+              productId: product.id,
+              modelName: product.modelName,
+              productName: product.name,
+              sizeLabel: selectedSize,
+              quantity: 1,
+              imageUrl: product.imageUrl
+            })
+          }
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-black transition hover:rotate-90 hover:bg-lime-300"
+          aria-label={`Ajouter ${product.modelName} au panier`}
+        >
+          {selectedSize ? <ShoppingBag className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+        </button>
       </div>
     </motion.article>
   );

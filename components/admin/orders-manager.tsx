@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 
 type Order = {
@@ -30,6 +31,7 @@ type ImagePreview = {
 const statuses = ["NEW", "REVIEWING", "CONTACTED", "CLOSED"];
 
 export function OrdersManager({ orders }: { orders: Order[] }) {
+  const router = useRouter();
   const [preview, setPreview] = useState<ImagePreview | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -58,7 +60,7 @@ export function OrdersManager({ orders }: { orders: Order[] }) {
       return;
     }
 
-    window.location.reload();
+    router.refresh();
   }
 
   async function deleteOrder(id: string) {
@@ -81,7 +83,7 @@ export function OrdersManager({ orders }: { orders: Order[] }) {
       return;
     }
 
-    window.location.reload();
+    router.refresh();
   }
 
   return (
@@ -149,6 +151,8 @@ export function OrdersManager({ orders }: { orders: Order[] }) {
                         <img
                           src={item.imageUrl}
                           alt=""
+                          loading="lazy"
+                          decoding="async"
                           className="h-20 w-20 object-cover transition duration-300 group-hover:scale-105"
                         />
                       </button>

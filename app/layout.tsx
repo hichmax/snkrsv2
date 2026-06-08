@@ -1,5 +1,5 @@
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Syne } from "next/font/google";
 import { CartProvider } from "@/components/site/cart-provider";
 import { CartOverlay } from "@/components/site/cart-overlay";
@@ -17,7 +17,22 @@ const syne = Syne({
 
 export const metadata: Metadata = {
   title: siteContent.brand.metadataTitle,
-  description: siteContent.brand.metadataDescription
+  description: siteContent.brand.metadataDescription,
+  applicationName: "Sneakers Addict",
+  category: "shopping",
+  openGraph: {
+    title: siteContent.brand.metadataTitle,
+    description: siteContent.brand.metadataDescription,
+    type: "website",
+    locale: "fr_FR"
+  }
+};
+
+export const viewport: Viewport = {
+  themeColor: "#050505",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1
 };
 
 export default function RootLayout({

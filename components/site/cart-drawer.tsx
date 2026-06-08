@@ -127,6 +127,8 @@ export function CartDrawer() {
                           <img
                             src={item.imageUrl}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="h-24 w-24 rounded-2xl object-cover"
                           />
                         ) : null}

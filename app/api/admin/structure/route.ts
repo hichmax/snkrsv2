@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { assertAdminApi } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
+import { deleteStoredAssets } from "@/lib/storage";
 
 export async function POST(request: Request) {
   try {
@@ -63,17 +65,33 @@ export async function POST(request: Request) {
     }
 
     if (entity === "category" && action === "delete" && id) {
+      const assets = await prisma.product.findMany({
+        where: { model: { brand: { categoryId: id } } },
+        select: { storageProvider: true, storageKey: true }
+      });
+      await deleteStoredAssets(assets);
       await prisma.category.delete({ where: { id } });
     }
 
     if (entity === "brand" && action === "delete" && id) {
+      const assets = await prisma.product.findMany({
+        where: { model: { brandId: id } },
+        select: { storageProvider: true, storageKey: true }
+      });
+      await deleteStoredAssets(assets);
       await prisma.brand.delete({ where: { id } });
     }
 
     if (entity === "model" && action === "delete" && id) {
+      const assets = await prisma.product.findMany({
+        where: { modelId: id },
+        select: { storageProvider: true, storageKey: true }
+      });
+      await deleteStoredAssets(assets);
       await prisma.productModel.delete({ where: { id } });
     }
 
+    revalidatePath("/", "layout");
     return NextResponse.json({ ok: true });
   } catch (error) {
     return NextResponse.json(

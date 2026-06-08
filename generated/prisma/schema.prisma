@@ -14,6 +14,13 @@ enum ProductStatus {
   HIDDEN
 }
 
+enum StorageProvider {
+  CLOUDINARY
+  CLOUDFLARE_R2
+  SUPABASE
+  EXTERNAL
+}
+
 enum OrderStatus {
   NEW
   REVIEWING
@@ -67,21 +74,28 @@ model ProductModel {
 }
 
 model Product {
-  id                 String        @id @default(cuid())
+  id                 String          @id @default(cuid())
   modelId            String
   name               String
   color              String?
-  priceText          String?       @default("Prix sur demande")
+  priceText          String?         @default("Prix sur demande")
   imageUrl           String
   imageAlt           String?
-  cloudinaryPublicId String?       @unique
-  status             ProductStatus @default(PUBLISHED)
-  isFeatured         Boolean       @default(false)
-  sortOrder          Int           @default(0)
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
-  model              ProductModel  @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  storageProvider    StorageProvider @default(EXTERNAL)
+  storageKey         String?
+  mediaBytes         BigInt?
+  mediaMimeType      String?
+  cloudinaryPublicId String?         @unique
+  status             ProductStatus   @default(PUBLISHED)
+  isFeatured         Boolean         @default(false)
+  sortOrder          Int             @default(0)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  model              ProductModel    @relation(fields: [modelId], references: [id], onDelete: Cascade)
   sizes              ProductSize[]
+
+  @@unique([storageProvider, storageKey])
+  @@index([storageProvider])
 }
 
 model ProductSize {

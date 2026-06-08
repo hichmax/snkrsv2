@@ -169,6 +169,10 @@ exports.Prisma.ProductScalarFieldEnum = {
   priceText: 'priceText',
   imageUrl: 'imageUrl',
   imageAlt: 'imageAlt',
+  storageProvider: 'storageProvider',
+  storageKey: 'storageKey',
+  mediaBytes: 'mediaBytes',
+  mediaMimeType: 'mediaMimeType',
   cloudinaryPublicId: 'cloudinaryPublicId',
   status: 'status',
   isFeatured: 'isFeatured',
@@ -221,6 +225,13 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.StorageProvider = exports.$Enums.StorageProvider = {
+  CLOUDINARY: 'CLOUDINARY',
+  CLOUDFLARE_R2: 'CLOUDFLARE_R2',
+  SUPABASE: 'SUPABASE',
+  EXTERNAL: 'EXTERNAL'
+};
+
 exports.ProductStatus = exports.$Enums.ProductStatus = {
   DRAFT: 'DRAFT',
   PUBLISHED: 'PUBLISHED',

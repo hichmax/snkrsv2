@@ -1,9 +1,9 @@
-# Sneakers Addict V2 — local first / Node.js
+# Sneakers Addict V2 — multi-stockage / motion commerce
 
 Refonte complète pensée pour :
 - **Next.js App Router**
 - **PostgreSQL + Prisma**
-- **Cloudinary Upload Widget** pour l'upload massif
+- **Cloudinary + Cloudflare R2 + Supabase Storage** pour l'upload massif
 - **admin custom** avec bulk actions
 - **front premium** streetwear / chic / motion design
 
@@ -29,7 +29,7 @@ Front:
 
 Définis `ADMIN_PASSWORD` dans `.env.local`.
 
-## 3) Cloudinary
+## 3) Stockage des images
 
 Renseigne :
 - `CLOUDINARY_CLOUD_NAME`
@@ -38,7 +38,11 @@ Renseigne :
 - `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`
 
 Le studio d'upload signé est prêt côté admin :
-- `Admin > Upload Studio`
+- `Admin > Studio upload`
+
+Configuration complète :
+- [`docs/MULTI_STORAGE_SETUP.md`](docs/MULTI_STORAGE_SETUP.md)
+- [`docs/CATALOGUE_REIMPORT_GUIDE.md`](docs/CATALOGUE_REIMPORT_GUIDE.md)
 
 ## 4) Structure de catalogue
 
@@ -68,7 +72,8 @@ Hiérarchie :
 - gestion des commandes entrantes
 
 ## 6) Points forts techniques
-- aucune dépendance à Supabase Storage
-- signatures upload générées côté serveur
+- upload direct navigateur vers l'hébergeur choisi
+- signatures générées côté serveur, secrets jamais exposés
+- capacité et volume suivi visibles dans l'admin
 - Prisma pour les relations et migrations
 - code organisé pour passer ensuite sur Vercel sans refonte

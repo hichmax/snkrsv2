@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type Product = {
   id: string;
@@ -10,6 +11,8 @@ type Product = {
   imageUrl: string;
   status: "DRAFT" | "PUBLISHED" | "HIDDEN";
   isFeatured: boolean;
+  storageProvider: "CLOUDINARY" | "CLOUDFLARE_R2" | "SUPABASE" | "EXTERNAL";
+  mediaBytes?: number | null;
   model: {
     name: string;
     slug: string;
@@ -30,17 +33,21 @@ type Product = {
 };
 
 export function ProductsManager({ products }: { products: Product[] }) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(24);
 
   const filtered = useMemo(() => {
     const needle = query.toLowerCase();
     return products.filter((product) => {
       const hay = [
+        product.name,
         product.model.name,
         product.model.brand.name,
-        product.model.brand.category.name
+        product.model.brand.category.name,
+        product.storageProvider
       ]
         .join(" ")
         .toLowerCase();
@@ -48,6 +55,10 @@ export function ProductsManager({ products }: { products: Product[] }) {
       return hay.includes(needle);
     });
   }, [products, query]);
+
+  useEffect(() => {
+    setVisibleCount(24);
+  }, [query]);
 
   const toggleOne = (id: string) => {
     setSelectedIds((current) =>
@@ -72,7 +83,8 @@ export function ProductsManager({ products }: { products: Product[] }) {
       return;
     }
 
-    window.location.reload();
+    setSelectedIds([]);
+    router.refresh();
   }
 
   return (
@@ -119,10 +131,16 @@ export function ProductsManager({ products }: { products: Product[] }) {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-3">
-        {filtered.map((product) => (
+        {filtered.slice(0, visibleCount).map((product) => (
           <div key={product.id} className="rounded-[28px] border border-white/10 bg-white/[0.04] p-4">
             <div className="relative overflow-hidden rounded-[24px]">
-              <img src={product.imageUrl} alt="" className="aspect-[4/5] w-full object-cover" />
+              <img
+                src={product.imageUrl}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="aspect-[4/5] w-full object-cover"
+              />
               <label className="absolute left-3 top-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-xs backdrop-blur-md">
                 <input
                   type="checkbox"
@@ -143,6 +161,9 @@ export function ProductsManager({ products }: { products: Product[] }) {
                 </span>
                 <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-white/70">
                   {product.status}
+                </span>
+                <span className="rounded-full border border-sky-300/15 bg-sky-300/[0.06] px-3 py-1 text-xs text-sky-100/80">
+                  {product.storageProvider.replace("CLOUDFLARE_", "")}
                 </span>
                 {product.isFeatured ? (
                   <span className="rounded-full bg-lime-300 px-3 py-1 text-xs font-semibold text-black">
@@ -190,6 +211,14 @@ export function ProductsManager({ products }: { products: Product[] }) {
           </div>
         ))}
       </div>
+      {visibleCount < filtered.length ? (
+        <button
+          onClick={() => setVisibleCount((count) => count + 24)}
+          className="admin-secondary-button mx-auto"
+        >
+          Afficher 24 produits de plus
+        </button>
+      ) : null}
     </div>
   );
 }

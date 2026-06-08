@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { assertAdminApi } from "@/lib/auth";
 import { ProductStatus } from "@/generated/prisma";
+import { revalidatePath } from "next/cache";
+import { deleteStoredAssets } from "@/lib/storage";
 
 export async function POST(request: Request) {
   try {
@@ -43,11 +45,17 @@ export async function POST(request: Request) {
     }
 
     if (action === "delete") {
+      const assets = await prisma.product.findMany({
+        where: { id: { in: ids } },
+        select: { storageProvider: true, storageKey: true }
+      });
+      await deleteStoredAssets(assets);
       await prisma.product.deleteMany({
         where: { id: { in: ids } }
       });
     }
 
+    revalidatePath("/", "layout");
     return NextResponse.json({ ok: true });
   } catch (error) {
     return NextResponse.json(

@@ -1,10 +1,21 @@
-export const dynamic = "force-dynamic";
-
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SiteHeader } from "@/components/site/site-header";
+import { CatalogHero } from "@/components/site/catalog-hero";
+import { EditorialCard } from "@/components/site/editorial-card";
+import { MotionReveal } from "@/components/site/motion-reveal";
 import { SiteFooter } from "@/components/site/site-footer";
-import { getCategoryPage, getVisibleCatalog } from "@/lib/queries";
+import { SiteHeader } from "@/components/site/site-header";
+import { getCatalogStaticParams, getCategoryPage, getPublicNav } from "@/lib/queries";
+
+export const revalidate = 300;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const categories = await getCatalogStaticParams();
+  return categories.map((category) => ({ categorySlug: category.slug }));
+}
+
+const fallback =
+  "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1800&q=85";
 
 export default async function CategoryPage({
   params
@@ -14,67 +25,63 @@ export default async function CategoryPage({
   const { categorySlug } = await params;
   const [category, catalog] = await Promise.all([
     getCategoryPage(categorySlug),
-    getVisibleCatalog()
+    getPublicNav()
   ]);
 
-  if (!category) {
-    notFound();
-  }
+  if (!category) notFound();
 
-  const nav = catalog.slice(0, 4).map((item) => ({
+  const nav = catalog.map((item) => ({
     label: item.name,
     href: `/catalog/${item.slug}`
   }));
+  const productCount = category.brands.reduce(
+    (sum, brand) =>
+      sum + brand.models.reduce((modelSum, model) => modelSum + model._count.products, 0),
+    0
+  );
 
   return (
     <main>
       <SiteHeader nav={nav} />
-      <section className="px-4 pb-12 pt-6 md:px-8">
-        <div className="mx-auto max-w-7xl rounded-[40px] border border-white/10 bg-white/[0.04] p-6 md:p-8">
-          <p className="text-[11px] uppercase tracking-[0.35em] text-white/35">
-            catégorie
-          </p>
-          <h1 className="mt-3 text-5xl font-semibold">{category.name}</h1>
-          <p className="mt-4 max-w-3xl text-white/60">
-            {category.description || "Sélection structurée par marques, lecture éditoriale et photo-first."}
-          </p>
-        </div>
-      </section>
+      <CatalogHero
+        eyebrow="Collection / 01"
+        title={category.name}
+        description={
+          category.description ||
+          "Une sélection structurée par marques, pensée comme un lookbook rapide à explorer."
+        }
+        image={category.heroImage || fallback}
+        stats={[
+          { label: "marques", value: category.brands.length },
+          { label: "pièces", value: productCount }
+        ]}
+      />
 
-      <section className="px-4 pb-16 md:px-8">
-        <div className="mx-auto grid max-w-7xl gap-5 lg:grid-cols-3">
-          {category.brands.map((brand) => (
-            <Link
+      <section id="collection" className="section-shell">
+        <div className="section-heading">
+          <MotionReveal>
+            <p className="eyebrow">Select your label</p>
+            <h2 className="section-title">Les marques.</h2>
+          </MotionReveal>
+          <MotionReveal delay={0.1} className="max-w-sm text-sm leading-6 text-white/45">
+            Entrez dans un univers, choisissez un modèle, puis parcourez toutes ses variations.
+          </MotionReveal>
+        </div>
+        <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {category.brands.map((brand, index) => (
+            <EditorialCard
               key={brand.id}
               href={`/catalog/${category.slug}/${brand.slug}`}
-              className="group overflow-hidden rounded-[34px] border border-white/10 bg-white/[0.04]"
-            >
-              <div className="relative aspect-[4/3] overflow-hidden">
-                <img
-                  src={
-                    brand.imageUrl ||
-                    category.heroImage ||
-                    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1400&q=80"
-                  }
-                  alt={brand.name}
-                  className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.05]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-5">
-                  <p className="text-[11px] uppercase tracking-[0.3em] text-white/40">
-                    {category.name}
-                  </p>
-                  <h2 className="mt-3 text-3xl font-semibold">{brand.name}</h2>
-                  <p className="mt-2 text-sm text-white/60">
-                    {brand.models.length} modèles visibles
-                  </p>
-                </div>
-              </div>
-            </Link>
+              image={brand.imageUrl || category.heroImage || fallback}
+              eyebrow={category.name}
+              title={brand.name}
+              meta={`${brand.models.length} modèles visibles`}
+              index={index}
+              aspect={index % 3 === 0 ? "landscape" : "portrait"}
+            />
           ))}
         </div>
       </section>
-
       <SiteFooter />
     </main>
   );

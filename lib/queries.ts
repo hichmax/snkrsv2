@@ -29,8 +29,36 @@ export async function getVisibleCatalog() {
   });
 }
 
+export async function getPublicNav() {
+  return prisma.category.findMany({
+    where: { isVisible: true },
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    take: 5,
+    select: { id: true, name: true, slug: true }
+  });
+}
+
+export async function getCatalogStaticParams() {
+  return prisma.category.findMany({
+    where: { isVisible: true },
+    select: {
+      slug: true,
+      brands: {
+        where: { isVisible: true },
+        select: {
+          slug: true,
+          models: {
+            where: { isVisible: true },
+            select: { slug: true }
+          }
+        }
+      }
+    }
+  });
+}
+
 export async function getHomeData() {
-  const [categories, featured, latest] = await Promise.all([
+  const [categories, featured, latest, productCount] = await Promise.all([
     prisma.category.findMany({
       where: { isVisible: true },
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
@@ -75,10 +103,11 @@ export async function getHomeData() {
           }
         }
       }
-    })
+    }),
+    prisma.product.count({ where: { status: ProductStatus.PUBLISHED } })
   ]);
 
-  return { categories, featured, latest };
+  return { categories, featured, latest, productCount };
 }
 
 export async function getCategoryPage(slug: string) {
@@ -199,4 +228,79 @@ export async function getAdminSnapshot() {
   ]);
 
   return { categories, brands, models, products, orders };
+}
+
+export async function getAdminDashboardStats() {
+  const [categories, brands, models, products, orders] = await Promise.all([
+    prisma.category.count(),
+    prisma.brand.count(),
+    prisma.productModel.count(),
+    prisma.product.count(),
+    prisma.orderRequest.count()
+  ]);
+
+  return { categories, brands, models, products, orders };
+}
+
+export async function getAdminUploadStructure() {
+  const [categories, brands, models] = await Promise.all([
+    prisma.category.findMany({
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      select: { id: true, name: true }
+    }),
+    prisma.brand.findMany({
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      select: { id: true, name: true, categoryId: true }
+    }),
+    prisma.productModel.findMany({
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      select: { id: true, name: true, brandId: true }
+    })
+  ]);
+
+  return { categories, brands, models };
+}
+
+export async function getAdminStructure() {
+  const [categories, brands, models] = await Promise.all([
+    prisma.category.findMany({
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      include: { brands: true }
+    }),
+    prisma.brand.findMany({
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      include: { category: true, models: true }
+    }),
+    prisma.productModel.findMany({
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      include: {
+        brand: { include: { category: true } },
+        _count: { select: { products: true } }
+      }
+    })
+  ]);
+
+  return { categories, brands, models };
+}
+
+export async function getAdminProducts() {
+  const products = await prisma.product.findMany({
+    orderBy: [{ updatedAt: "desc" }],
+    include: {
+      model: { include: { brand: { include: { category: true } } } },
+      sizes: true
+    }
+  });
+
+  return products.map((product) => ({
+    ...product,
+    mediaBytes: product.mediaBytes ? Number(product.mediaBytes) : null
+  }));
+}
+
+export async function getAdminOrders() {
+  return prisma.orderRequest.findMany({
+    orderBy: [{ createdAt: "desc" }],
+    include: { items: true }
+  });
 }

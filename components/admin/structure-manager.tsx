@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { makeSlug } from "@/lib/utils";
 
 type Category = {
@@ -64,6 +65,7 @@ const defaultState: FormState = {
 };
 
 export function StructureManager({ categories, brands, models }: Props) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [categoryForm, setCategoryForm] = useState<FormState>(defaultState);
   const [brandForm, setBrandForm] = useState<FormState>(defaultState);
@@ -153,7 +155,7 @@ export function StructureManager({ categories, brands, models }: Props) {
       return false;
     }
 
-    window.location.reload();
+    router.refresh();
     return true;
   }
 

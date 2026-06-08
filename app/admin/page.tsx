@@ -2,20 +2,20 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { getAdminSnapshot } from "@/lib/queries";
+import { getAdminDashboardStats } from "@/lib/queries";
 import { requireAdmin } from "@/lib/auth";
 import { siteContent } from "@/content/site-content";
 
 export default async function AdminDashboardPage() {
   await requireAdmin();
-  const data = await getAdminSnapshot();
+  const data = await getAdminDashboardStats();
 
   const cards = [
-    { label: "Catégories", value: data.categories.length, href: "/admin/structure" },
-    { label: "Marques", value: data.brands.length, href: "/admin/structure" },
-    { label: "Modèles", value: data.models.length, href: "/admin/structure" },
-    { label: "Produits", value: data.products.length, href: "/admin/products" },
-    { label: "Commandes", value: data.orders.length, href: "/admin/orders" }
+    { label: "Catégories", value: data.categories, href: "/admin/structure" },
+    { label: "Marques", value: data.brands, href: "/admin/structure" },
+    { label: "Modèles", value: data.models, href: "/admin/structure" },
+    { label: "Produits", value: data.products, href: "/admin/products" },
+    { label: "Commandes", value: data.orders, href: "/admin/orders" }
   ];
 
   return (

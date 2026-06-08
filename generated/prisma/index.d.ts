@@ -62,6 +62,16 @@ export namespace $Enums {
 export type ProductStatus = (typeof ProductStatus)[keyof typeof ProductStatus]
 
 
+export const StorageProvider: {
+  CLOUDINARY: 'CLOUDINARY',
+  CLOUDFLARE_R2: 'CLOUDFLARE_R2',
+  SUPABASE: 'SUPABASE',
+  EXTERNAL: 'EXTERNAL'
+};
+
+export type StorageProvider = (typeof StorageProvider)[keyof typeof StorageProvider]
+
+
 export const OrderStatus: {
   NEW: 'NEW',
   REVIEWING: 'REVIEWING',
@@ -76,6 +86,10 @@ export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
 export type ProductStatus = $Enums.ProductStatus
 
 export const ProductStatus: typeof $Enums.ProductStatus
+
+export type StorageProvider = $Enums.StorageProvider
+
+export const StorageProvider: typeof $Enums.StorageProvider
 
 export type OrderStatus = $Enums.OrderStatus
 
@@ -5162,10 +5176,12 @@ export namespace Prisma {
   }
 
   export type ProductAvgAggregateOutputType = {
+    mediaBytes: number | null
     sortOrder: number | null
   }
 
   export type ProductSumAggregateOutputType = {
+    mediaBytes: bigint | null
     sortOrder: number | null
   }
 
@@ -5177,6 +5193,10 @@ export namespace Prisma {
     priceText: string | null
     imageUrl: string | null
     imageAlt: string | null
+    storageProvider: $Enums.StorageProvider | null
+    storageKey: string | null
+    mediaBytes: bigint | null
+    mediaMimeType: string | null
     cloudinaryPublicId: string | null
     status: $Enums.ProductStatus | null
     isFeatured: boolean | null
@@ -5193,6 +5213,10 @@ export namespace Prisma {
     priceText: string | null
     imageUrl: string | null
     imageAlt: string | null
+    storageProvider: $Enums.StorageProvider | null
+    storageKey: string | null
+    mediaBytes: bigint | null
+    mediaMimeType: string | null
     cloudinaryPublicId: string | null
     status: $Enums.ProductStatus | null
     isFeatured: boolean | null
@@ -5209,6 +5233,10 @@ export namespace Prisma {
     priceText: number
     imageUrl: number
     imageAlt: number
+    storageProvider: number
+    storageKey: number
+    mediaBytes: number
+    mediaMimeType: number
     cloudinaryPublicId: number
     status: number
     isFeatured: number
@@ -5220,10 +5248,12 @@ export namespace Prisma {
 
 
   export type ProductAvgAggregateInputType = {
+    mediaBytes?: true
     sortOrder?: true
   }
 
   export type ProductSumAggregateInputType = {
+    mediaBytes?: true
     sortOrder?: true
   }
 
@@ -5235,6 +5265,10 @@ export namespace Prisma {
     priceText?: true
     imageUrl?: true
     imageAlt?: true
+    storageProvider?: true
+    storageKey?: true
+    mediaBytes?: true
+    mediaMimeType?: true
     cloudinaryPublicId?: true
     status?: true
     isFeatured?: true
@@ -5251,6 +5285,10 @@ export namespace Prisma {
     priceText?: true
     imageUrl?: true
     imageAlt?: true
+    storageProvider?: true
+    storageKey?: true
+    mediaBytes?: true
+    mediaMimeType?: true
     cloudinaryPublicId?: true
     status?: true
     isFeatured?: true
@@ -5267,6 +5305,10 @@ export namespace Prisma {
     priceText?: true
     imageUrl?: true
     imageAlt?: true
+    storageProvider?: true
+    storageKey?: true
+    mediaBytes?: true
+    mediaMimeType?: true
     cloudinaryPublicId?: true
     status?: true
     isFeatured?: true
@@ -5370,6 +5412,10 @@ export namespace Prisma {
     priceText: string | null
     imageUrl: string
     imageAlt: string | null
+    storageProvider: $Enums.StorageProvider
+    storageKey: string | null
+    mediaBytes: bigint | null
+    mediaMimeType: string | null
     cloudinaryPublicId: string | null
     status: $Enums.ProductStatus
     isFeatured: boolean
@@ -5405,6 +5451,10 @@ export namespace Prisma {
     priceText?: boolean
     imageUrl?: boolean
     imageAlt?: boolean
+    storageProvider?: boolean
+    storageKey?: boolean
+    mediaBytes?: boolean
+    mediaMimeType?: boolean
     cloudinaryPublicId?: boolean
     status?: boolean
     isFeatured?: boolean
@@ -5424,6 +5474,10 @@ export namespace Prisma {
     priceText?: boolean
     imageUrl?: boolean
     imageAlt?: boolean
+    storageProvider?: boolean
+    storageKey?: boolean
+    mediaBytes?: boolean
+    mediaMimeType?: boolean
     cloudinaryPublicId?: boolean
     status?: boolean
     isFeatured?: boolean
@@ -5441,6 +5495,10 @@ export namespace Prisma {
     priceText?: boolean
     imageUrl?: boolean
     imageAlt?: boolean
+    storageProvider?: boolean
+    storageKey?: boolean
+    mediaBytes?: boolean
+    mediaMimeType?: boolean
     cloudinaryPublicId?: boolean
     status?: boolean
     isFeatured?: boolean
@@ -5458,6 +5516,10 @@ export namespace Prisma {
     priceText?: boolean
     imageUrl?: boolean
     imageAlt?: boolean
+    storageProvider?: boolean
+    storageKey?: boolean
+    mediaBytes?: boolean
+    mediaMimeType?: boolean
     cloudinaryPublicId?: boolean
     status?: boolean
     isFeatured?: boolean
@@ -5466,7 +5528,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "modelId" | "name" | "color" | "priceText" | "imageUrl" | "imageAlt" | "cloudinaryPublicId" | "status" | "isFeatured" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "modelId" | "name" | "color" | "priceText" | "imageUrl" | "imageAlt" | "storageProvider" | "storageKey" | "mediaBytes" | "mediaMimeType" | "cloudinaryPublicId" | "status" | "isFeatured" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
   export type ProductInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     model?: boolean | ProductModelDefaultArgs<ExtArgs>
     sizes?: boolean | Product$sizesArgs<ExtArgs>
@@ -5493,6 +5555,10 @@ export namespace Prisma {
       priceText: string | null
       imageUrl: string
       imageAlt: string | null
+      storageProvider: $Enums.StorageProvider
+      storageKey: string | null
+      mediaBytes: bigint | null
+      mediaMimeType: string | null
       cloudinaryPublicId: string | null
       status: $Enums.ProductStatus
       isFeatured: boolean
@@ -5931,6 +5997,10 @@ export namespace Prisma {
     readonly priceText: FieldRef<"Product", 'String'>
     readonly imageUrl: FieldRef<"Product", 'String'>
     readonly imageAlt: FieldRef<"Product", 'String'>
+    readonly storageProvider: FieldRef<"Product", 'StorageProvider'>
+    readonly storageKey: FieldRef<"Product", 'String'>
+    readonly mediaBytes: FieldRef<"Product", 'BigInt'>
+    readonly mediaMimeType: FieldRef<"Product", 'String'>
     readonly cloudinaryPublicId: FieldRef<"Product", 'String'>
     readonly status: FieldRef<"Product", 'ProductStatus'>
     readonly isFeatured: FieldRef<"Product", 'Boolean'>
@@ -9744,6 +9814,10 @@ export namespace Prisma {
     priceText: 'priceText',
     imageUrl: 'imageUrl',
     imageAlt: 'imageAlt',
+    storageProvider: 'storageProvider',
+    storageKey: 'storageKey',
+    mediaBytes: 'mediaBytes',
+    mediaMimeType: 'mediaMimeType',
     cloudinaryPublicId: 'cloudinaryPublicId',
     status: 'status',
     isFeatured: 'isFeatured',
@@ -9869,6 +9943,34 @@ export namespace Prisma {
    * Reference to a field of type 'DateTime[]'
    */
   export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'StorageProvider'
+   */
+  export type EnumStorageProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StorageProvider'>
+    
+
+
+  /**
+   * Reference to a field of type 'StorageProvider[]'
+   */
+  export type ListEnumStorageProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StorageProvider[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'BigInt'
+   */
+  export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
+    
+
+
+  /**
+   * Reference to a field of type 'BigInt[]'
+   */
+  export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
     
 
 
@@ -10185,6 +10287,10 @@ export namespace Prisma {
     priceText?: StringNullableFilter<"Product"> | string | null
     imageUrl?: StringFilter<"Product"> | string
     imageAlt?: StringNullableFilter<"Product"> | string | null
+    storageProvider?: EnumStorageProviderFilter<"Product"> | $Enums.StorageProvider
+    storageKey?: StringNullableFilter<"Product"> | string | null
+    mediaBytes?: BigIntNullableFilter<"Product"> | bigint | number | null
+    mediaMimeType?: StringNullableFilter<"Product"> | string | null
     cloudinaryPublicId?: StringNullableFilter<"Product"> | string | null
     status?: EnumProductStatusFilter<"Product"> | $Enums.ProductStatus
     isFeatured?: BoolFilter<"Product"> | boolean
@@ -10203,6 +10309,10 @@ export namespace Prisma {
     priceText?: SortOrderInput | SortOrder
     imageUrl?: SortOrder
     imageAlt?: SortOrderInput | SortOrder
+    storageProvider?: SortOrder
+    storageKey?: SortOrderInput | SortOrder
+    mediaBytes?: SortOrderInput | SortOrder
+    mediaMimeType?: SortOrderInput | SortOrder
     cloudinaryPublicId?: SortOrderInput | SortOrder
     status?: SortOrder
     isFeatured?: SortOrder
@@ -10216,6 +10326,7 @@ export namespace Prisma {
   export type ProductWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     cloudinaryPublicId?: string
+    storageProvider_storageKey?: ProductStorageProviderStorageKeyCompoundUniqueInput
     AND?: ProductWhereInput | ProductWhereInput[]
     OR?: ProductWhereInput[]
     NOT?: ProductWhereInput | ProductWhereInput[]
@@ -10225,6 +10336,10 @@ export namespace Prisma {
     priceText?: StringNullableFilter<"Product"> | string | null
     imageUrl?: StringFilter<"Product"> | string
     imageAlt?: StringNullableFilter<"Product"> | string | null
+    storageProvider?: EnumStorageProviderFilter<"Product"> | $Enums.StorageProvider
+    storageKey?: StringNullableFilter<"Product"> | string | null
+    mediaBytes?: BigIntNullableFilter<"Product"> | bigint | number | null
+    mediaMimeType?: StringNullableFilter<"Product"> | string | null
     status?: EnumProductStatusFilter<"Product"> | $Enums.ProductStatus
     isFeatured?: BoolFilter<"Product"> | boolean
     sortOrder?: IntFilter<"Product"> | number
@@ -10232,7 +10347,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Product"> | Date | string
     model?: XOR<ProductModelScalarRelationFilter, ProductModelWhereInput>
     sizes?: ProductSizeListRelationFilter
-  }, "id" | "cloudinaryPublicId">
+  }, "id" | "cloudinaryPublicId" | "storageProvider_storageKey">
 
   export type ProductOrderByWithAggregationInput = {
     id?: SortOrder
@@ -10242,6 +10357,10 @@ export namespace Prisma {
     priceText?: SortOrderInput | SortOrder
     imageUrl?: SortOrder
     imageAlt?: SortOrderInput | SortOrder
+    storageProvider?: SortOrder
+    storageKey?: SortOrderInput | SortOrder
+    mediaBytes?: SortOrderInput | SortOrder
+    mediaMimeType?: SortOrderInput | SortOrder
     cloudinaryPublicId?: SortOrderInput | SortOrder
     status?: SortOrder
     isFeatured?: SortOrder
@@ -10266,6 +10385,10 @@ export namespace Prisma {
     priceText?: StringNullableWithAggregatesFilter<"Product"> | string | null
     imageUrl?: StringWithAggregatesFilter<"Product"> | string
     imageAlt?: StringNullableWithAggregatesFilter<"Product"> | string | null
+    storageProvider?: EnumStorageProviderWithAggregatesFilter<"Product"> | $Enums.StorageProvider
+    storageKey?: StringNullableWithAggregatesFilter<"Product"> | string | null
+    mediaBytes?: BigIntNullableWithAggregatesFilter<"Product"> | bigint | number | null
+    mediaMimeType?: StringNullableWithAggregatesFilter<"Product"> | string | null
     cloudinaryPublicId?: StringNullableWithAggregatesFilter<"Product"> | string | null
     status?: EnumProductStatusWithAggregatesFilter<"Product"> | $Enums.ProductStatus
     isFeatured?: BoolWithAggregatesFilter<"Product"> | boolean
@@ -10768,6 +10891,10 @@ export namespace Prisma {
     priceText?: string | null
     imageUrl: string
     imageAlt?: string | null
+    storageProvider?: $Enums.StorageProvider
+    storageKey?: string | null
+    mediaBytes?: bigint | number | null
+    mediaMimeType?: string | null
     cloudinaryPublicId?: string | null
     status?: $Enums.ProductStatus
     isFeatured?: boolean
@@ -10786,6 +10913,10 @@ export namespace Prisma {
     priceText?: string | null
     imageUrl: string
     imageAlt?: string | null
+    storageProvider?: $Enums.StorageProvider
+    storageKey?: string | null
+    mediaBytes?: bigint | number | null
+    mediaMimeType?: string | null
     cloudinaryPublicId?: string | null
     status?: $Enums.ProductStatus
     isFeatured?: boolean
@@ -10802,6 +10933,10 @@ export namespace Prisma {
     priceText?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: StringFieldUpdateOperationsInput | string
     imageAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    storageProvider?: EnumStorageProviderFieldUpdateOperationsInput | $Enums.StorageProvider
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    mediaBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mediaMimeType?: NullableStringFieldUpdateOperationsInput | string | null
     cloudinaryPublicId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
@@ -10820,6 +10955,10 @@ export namespace Prisma {
     priceText?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: StringFieldUpdateOperationsInput | string
     imageAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    storageProvider?: EnumStorageProviderFieldUpdateOperationsInput | $Enums.StorageProvider
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    mediaBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mediaMimeType?: NullableStringFieldUpdateOperationsInput | string | null
     cloudinaryPublicId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
@@ -10837,6 +10976,10 @@ export namespace Prisma {
     priceText?: string | null
     imageUrl: string
     imageAlt?: string | null
+    storageProvider?: $Enums.StorageProvider
+    storageKey?: string | null
+    mediaBytes?: bigint | number | null
+    mediaMimeType?: string | null
     cloudinaryPublicId?: string | null
     status?: $Enums.ProductStatus
     isFeatured?: boolean
@@ -10852,6 +10995,10 @@ export namespace Prisma {
     priceText?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: StringFieldUpdateOperationsInput | string
     imageAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    storageProvider?: EnumStorageProviderFieldUpdateOperationsInput | $Enums.StorageProvider
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    mediaBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mediaMimeType?: NullableStringFieldUpdateOperationsInput | string | null
     cloudinaryPublicId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
@@ -10868,6 +11015,10 @@ export namespace Prisma {
     priceText?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: StringFieldUpdateOperationsInput | string
     imageAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    storageProvider?: EnumStorageProviderFieldUpdateOperationsInput | $Enums.StorageProvider
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    mediaBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mediaMimeType?: NullableStringFieldUpdateOperationsInput | string | null
     cloudinaryPublicId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
@@ -11408,6 +11559,24 @@ export namespace Prisma {
     sortOrder?: SortOrder
   }
 
+  export type EnumStorageProviderFilter<$PrismaModel = never> = {
+    equals?: $Enums.StorageProvider | EnumStorageProviderFieldRefInput<$PrismaModel>
+    in?: $Enums.StorageProvider[] | ListEnumStorageProviderFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StorageProvider[] | ListEnumStorageProviderFieldRefInput<$PrismaModel>
+    not?: NestedEnumStorageProviderFilter<$PrismaModel> | $Enums.StorageProvider
+  }
+
+  export type BigIntNullableFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableFilter<$PrismaModel> | bigint | number | null
+  }
+
   export type EnumProductStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.ProductStatus | EnumProductStatusFieldRefInput<$PrismaModel>
     in?: $Enums.ProductStatus[] | ListEnumProductStatusFieldRefInput<$PrismaModel>
@@ -11430,6 +11599,11 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type ProductStorageProviderStorageKeyCompoundUniqueInput = {
+    storageProvider: $Enums.StorageProvider
+    storageKey: string
+  }
+
   export type ProductCountOrderByAggregateInput = {
     id?: SortOrder
     modelId?: SortOrder
@@ -11438,6 +11612,10 @@ export namespace Prisma {
     priceText?: SortOrder
     imageUrl?: SortOrder
     imageAlt?: SortOrder
+    storageProvider?: SortOrder
+    storageKey?: SortOrder
+    mediaBytes?: SortOrder
+    mediaMimeType?: SortOrder
     cloudinaryPublicId?: SortOrder
     status?: SortOrder
     isFeatured?: SortOrder
@@ -11447,6 +11625,7 @@ export namespace Prisma {
   }
 
   export type ProductAvgOrderByAggregateInput = {
+    mediaBytes?: SortOrder
     sortOrder?: SortOrder
   }
 
@@ -11458,6 +11637,10 @@ export namespace Prisma {
     priceText?: SortOrder
     imageUrl?: SortOrder
     imageAlt?: SortOrder
+    storageProvider?: SortOrder
+    storageKey?: SortOrder
+    mediaBytes?: SortOrder
+    mediaMimeType?: SortOrder
     cloudinaryPublicId?: SortOrder
     status?: SortOrder
     isFeatured?: SortOrder
@@ -11474,6 +11657,10 @@ export namespace Prisma {
     priceText?: SortOrder
     imageUrl?: SortOrder
     imageAlt?: SortOrder
+    storageProvider?: SortOrder
+    storageKey?: SortOrder
+    mediaBytes?: SortOrder
+    mediaMimeType?: SortOrder
     cloudinaryPublicId?: SortOrder
     status?: SortOrder
     isFeatured?: SortOrder
@@ -11483,7 +11670,34 @@ export namespace Prisma {
   }
 
   export type ProductSumOrderByAggregateInput = {
+    mediaBytes?: SortOrder
     sortOrder?: SortOrder
+  }
+
+  export type EnumStorageProviderWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.StorageProvider | EnumStorageProviderFieldRefInput<$PrismaModel>
+    in?: $Enums.StorageProvider[] | ListEnumStorageProviderFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StorageProvider[] | ListEnumStorageProviderFieldRefInput<$PrismaModel>
+    not?: NestedEnumStorageProviderWithAggregatesFilter<$PrismaModel> | $Enums.StorageProvider
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumStorageProviderFilter<$PrismaModel>
+    _max?: NestedEnumStorageProviderFilter<$PrismaModel>
+  }
+
+  export type BigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableWithAggregatesFilter<$PrismaModel> | bigint | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedBigIntNullableFilter<$PrismaModel>
+    _min?: NestedBigIntNullableFilter<$PrismaModel>
+    _max?: NestedBigIntNullableFilter<$PrismaModel>
   }
 
   export type EnumProductStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -11829,6 +12043,18 @@ export namespace Prisma {
     connect?: ProductSizeWhereUniqueInput | ProductSizeWhereUniqueInput[]
   }
 
+  export type EnumStorageProviderFieldUpdateOperationsInput = {
+    set?: $Enums.StorageProvider
+  }
+
+  export type NullableBigIntFieldUpdateOperationsInput = {
+    set?: bigint | number | null
+    increment?: bigint | number
+    decrement?: bigint | number
+    multiply?: bigint | number
+    divide?: bigint | number
+  }
+
   export type EnumProductStatusFieldUpdateOperationsInput = {
     set?: $Enums.ProductStatus
   }
@@ -12092,11 +12318,66 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedEnumStorageProviderFilter<$PrismaModel = never> = {
+    equals?: $Enums.StorageProvider | EnumStorageProviderFieldRefInput<$PrismaModel>
+    in?: $Enums.StorageProvider[] | ListEnumStorageProviderFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StorageProvider[] | ListEnumStorageProviderFieldRefInput<$PrismaModel>
+    not?: NestedEnumStorageProviderFilter<$PrismaModel> | $Enums.StorageProvider
+  }
+
+  export type NestedBigIntNullableFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableFilter<$PrismaModel> | bigint | number | null
+  }
+
   export type NestedEnumProductStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.ProductStatus | EnumProductStatusFieldRefInput<$PrismaModel>
     in?: $Enums.ProductStatus[] | ListEnumProductStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.ProductStatus[] | ListEnumProductStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumProductStatusFilter<$PrismaModel> | $Enums.ProductStatus
+  }
+
+  export type NestedEnumStorageProviderWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.StorageProvider | EnumStorageProviderFieldRefInput<$PrismaModel>
+    in?: $Enums.StorageProvider[] | ListEnumStorageProviderFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StorageProvider[] | ListEnumStorageProviderFieldRefInput<$PrismaModel>
+    not?: NestedEnumStorageProviderWithAggregatesFilter<$PrismaModel> | $Enums.StorageProvider
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumStorageProviderFilter<$PrismaModel>
+    _max?: NestedEnumStorageProviderFilter<$PrismaModel>
+  }
+
+  export type NestedBigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableWithAggregatesFilter<$PrismaModel> | bigint | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedBigIntNullableFilter<$PrismaModel>
+    _min?: NestedBigIntNullableFilter<$PrismaModel>
+    _max?: NestedBigIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedEnumProductStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -12371,6 +12652,10 @@ export namespace Prisma {
     priceText?: string | null
     imageUrl: string
     imageAlt?: string | null
+    storageProvider?: $Enums.StorageProvider
+    storageKey?: string | null
+    mediaBytes?: bigint | number | null
+    mediaMimeType?: string | null
     cloudinaryPublicId?: string | null
     status?: $Enums.ProductStatus
     isFeatured?: boolean
@@ -12387,6 +12672,10 @@ export namespace Prisma {
     priceText?: string | null
     imageUrl: string
     imageAlt?: string | null
+    storageProvider?: $Enums.StorageProvider
+    storageKey?: string | null
+    mediaBytes?: bigint | number | null
+    mediaMimeType?: string | null
     cloudinaryPublicId?: string | null
     status?: $Enums.ProductStatus
     isFeatured?: boolean
@@ -12470,6 +12759,10 @@ export namespace Prisma {
     priceText?: StringNullableFilter<"Product"> | string | null
     imageUrl?: StringFilter<"Product"> | string
     imageAlt?: StringNullableFilter<"Product"> | string | null
+    storageProvider?: EnumStorageProviderFilter<"Product"> | $Enums.StorageProvider
+    storageKey?: StringNullableFilter<"Product"> | string | null
+    mediaBytes?: BigIntNullableFilter<"Product"> | bigint | number | null
+    mediaMimeType?: StringNullableFilter<"Product"> | string | null
     cloudinaryPublicId?: StringNullableFilter<"Product"> | string | null
     status?: EnumProductStatusFilter<"Product"> | $Enums.ProductStatus
     isFeatured?: BoolFilter<"Product"> | boolean
@@ -12605,6 +12898,10 @@ export namespace Prisma {
     priceText?: string | null
     imageUrl: string
     imageAlt?: string | null
+    storageProvider?: $Enums.StorageProvider
+    storageKey?: string | null
+    mediaBytes?: bigint | number | null
+    mediaMimeType?: string | null
     cloudinaryPublicId?: string | null
     status?: $Enums.ProductStatus
     isFeatured?: boolean
@@ -12622,6 +12919,10 @@ export namespace Prisma {
     priceText?: string | null
     imageUrl: string
     imageAlt?: string | null
+    storageProvider?: $Enums.StorageProvider
+    storageKey?: string | null
+    mediaBytes?: bigint | number | null
+    mediaMimeType?: string | null
     cloudinaryPublicId?: string | null
     status?: $Enums.ProductStatus
     isFeatured?: boolean
@@ -12653,6 +12954,10 @@ export namespace Prisma {
     priceText?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: StringFieldUpdateOperationsInput | string
     imageAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    storageProvider?: EnumStorageProviderFieldUpdateOperationsInput | $Enums.StorageProvider
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    mediaBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mediaMimeType?: NullableStringFieldUpdateOperationsInput | string | null
     cloudinaryPublicId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
@@ -12670,6 +12975,10 @@ export namespace Prisma {
     priceText?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: StringFieldUpdateOperationsInput | string
     imageAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    storageProvider?: EnumStorageProviderFieldUpdateOperationsInput | $Enums.StorageProvider
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    mediaBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mediaMimeType?: NullableStringFieldUpdateOperationsInput | string | null
     cloudinaryPublicId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
@@ -12913,6 +13222,10 @@ export namespace Prisma {
     priceText?: string | null
     imageUrl: string
     imageAlt?: string | null
+    storageProvider?: $Enums.StorageProvider
+    storageKey?: string | null
+    mediaBytes?: bigint | number | null
+    mediaMimeType?: string | null
     cloudinaryPublicId?: string | null
     status?: $Enums.ProductStatus
     isFeatured?: boolean
@@ -12928,6 +13241,10 @@ export namespace Prisma {
     priceText?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: StringFieldUpdateOperationsInput | string
     imageAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    storageProvider?: EnumStorageProviderFieldUpdateOperationsInput | $Enums.StorageProvider
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    mediaBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mediaMimeType?: NullableStringFieldUpdateOperationsInput | string | null
     cloudinaryPublicId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
@@ -12944,6 +13261,10 @@ export namespace Prisma {
     priceText?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: StringFieldUpdateOperationsInput | string
     imageAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    storageProvider?: EnumStorageProviderFieldUpdateOperationsInput | $Enums.StorageProvider
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    mediaBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mediaMimeType?: NullableStringFieldUpdateOperationsInput | string | null
     cloudinaryPublicId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
@@ -12960,6 +13281,10 @@ export namespace Prisma {
     priceText?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: StringFieldUpdateOperationsInput | string
     imageAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    storageProvider?: EnumStorageProviderFieldUpdateOperationsInput | $Enums.StorageProvider
+    storageKey?: NullableStringFieldUpdateOperationsInput | string | null
+    mediaBytes?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+    mediaMimeType?: NullableStringFieldUpdateOperationsInput | string | null
     cloudinaryPublicId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
     isFeatured?: BoolFieldUpdateOperationsInput | boolean
