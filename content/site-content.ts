@@ -56,7 +56,7 @@ export const siteContent = {
     errorText: "Impossible d'envoyer votre demande pour le moment.",
     namePlaceholder: "Nom complet *",
     phonePlaceholder: "Téléphone",
-    socialPlaceholder: "Instagram / Snapchat",
+    socialPlaceholder: "Snapchat",
     cityPlaceholder: "Ville",
     notePlaceholder: "Message / précisions",
     submitLabel: "Envoyer la demande",

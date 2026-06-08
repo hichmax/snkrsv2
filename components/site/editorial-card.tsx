@@ -30,7 +30,7 @@ export function EditorialCard({
       whileInView={reducedMotion ? {} : { opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.65, delay: Math.min(index * 0.07, 0.28) }}
-      whileHover={reducedMotion ? undefined : { y: -8 }}
+      whileHover={reducedMotion ? undefined : { y: -10, scale: 1.012 }}
       className="group"
     >
       <Link href={href} className="editorial-card">
@@ -54,7 +54,7 @@ export function EditorialCard({
           <div className="absolute right-4 top-4 flex h-11 w-11 translate-y-2 items-center justify-center rounded-full border border-white/15 bg-black/35 opacity-0 backdrop-blur-md transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
             <ArrowUpRight className="h-4 w-4" />
           </div>
-          <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
+          <div className="editorial-card-caption absolute inset-x-3 bottom-3 p-4 md:inset-x-4 md:bottom-4 md:p-5">
             <p className="eyebrow">{eyebrow}</p>
             <h3 className="mt-2 text-3xl font-semibold tracking-[-0.04em] md:text-4xl">
               {title}

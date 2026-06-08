@@ -31,7 +31,7 @@ export function CatalogHero({
           <MotionReveal>
             <p className="eyebrow">{eyebrow}</p>
             <h1 className="catalog-title mt-4">{title}</h1>
-            <div className="mt-7 flex flex-col gap-6 border-t border-white/20 pt-5 md:flex-row md:items-end md:justify-between">
+            <div className="catalog-hero-panel mt-7 flex flex-col gap-6 pt-5 md:flex-row md:items-end md:justify-between">
               <p className="max-w-2xl text-sm leading-7 text-white/65 md:text-base">{description}</p>
               <div className="flex flex-wrap gap-2">
                 {stats.map((stat) => (
@@ -55,8 +55,8 @@ export function CatalogHero({
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.9),rgba(0,0,0,.35))]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,5,12,.94),rgba(13,22,46,.34))]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#03050a]/80 via-transparent to-[#24365b]/15" />
       </div>
     </section>
   );

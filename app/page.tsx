@@ -4,7 +4,7 @@ import { EditorialCard } from "@/components/site/editorial-card";
 import { HomeHero } from "@/components/site/home-hero";
 import { Marquee } from "@/components/site/marquee";
 import { MotionReveal } from "@/components/site/motion-reveal";
-import { ProductTile } from "@/components/site/product-tile";
+import { ProductGallery } from "@/components/site/product-gallery";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { getHomeData } from "@/lib/queries";
@@ -39,14 +39,8 @@ export default async function HomePage() {
             <h2 className="section-title">
               Trouvez votre
               <br />
-              <span className="text-lime-300">prochaine pièce.</span>
+              <span className="liquid-gradient-text">prochaine pièce.</span>
             </h2>
-          </MotionReveal>
-          <MotionReveal delay={0.1} className="max-w-sm">
-            <p className="text-sm leading-7 text-white/50">
-              Une navigation pensée comme un lookbook : rapide, visuelle, sans bruit.
-              Chaque univers mène directement aux marques et modèles disponibles.
-            </p>
           </MotionReveal>
         </div>
 
@@ -79,8 +73,8 @@ export default async function HomePage() {
                 <br />
                 LA MASSE.
               </h2>
-              <div className="mt-8 flex flex-col gap-5 border-t border-black/15 pt-5 md:flex-row md:items-center md:justify-between">
-                <p className="max-w-xl text-sm leading-6 text-black/60">
+              <div className="mt-8 flex flex-col gap-5 border-t border-white/15 pt-5 md:flex-row md:items-center md:justify-between">
+                <p className="max-w-xl text-sm leading-6 text-white/55">
                   Des pièces fortes, des visuels nets et une commande sans friction.
                   Le catalogue change, l'attitude reste.
                 </p>
@@ -100,7 +94,7 @@ export default async function HomePage() {
             <h2 className="section-title">
               Le drop
               <br />
-              <span className="text-lime-300">du moment.</span>
+              <span className="liquid-gradient-text">du moment.</span>
             </h2>
           </MotionReveal>
           <MotionReveal delay={0.1}>
@@ -111,23 +105,20 @@ export default async function HomePage() {
           </MotionReveal>
         </div>
 
-        <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {featured.map((product, index) => (
-            <MotionReveal key={product.id} delay={index * 0.06}>
-              <ProductTile
-                product={{
-                  id: product.id,
-                  name: product.name,
-                  color: product.color,
-                  priceText: product.priceText,
-                  imageUrl: product.imageUrl,
-                  imageAlt: product.imageAlt,
-                  modelName: product.model.name,
-                  sizes: product.sizes
-                }}
-              />
-            </MotionReveal>
-          ))}
+        <div className="mt-8 md:mt-10">
+          <ProductGallery
+            desktopColumns={4}
+            products={featured.map((product) => ({
+              id: product.id,
+              name: product.name,
+              color: product.color,
+              priceText: product.priceText,
+              imageUrl: product.imageUrl,
+              imageAlt: product.imageAlt,
+              modelName: product.model.name,
+              sizes: product.sizes
+            }))}
+          />
         </div>
       </section>
 
@@ -154,7 +145,7 @@ export default async function HomePage() {
             return (
               <MotionReveal key={item.title} delay={index * 0.08} className="h-full">
                 <div className="h-full bg-[#0a0a0a] p-6 md:p-8">
-                  <Icon className="h-5 w-5 text-lime-300" />
+                  <Icon className="h-5 w-5 text-[var(--electric)]" />
                   <h3 className="mt-10 text-xl font-semibold">{item.title}</h3>
                   <p className="mt-3 text-sm leading-6 text-white/45">{item.text}</p>
                   <MoveRight className="mt-8 h-5 w-5 text-white/30" />

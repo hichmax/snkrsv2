@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { CatalogHero } from "@/components/site/catalog-hero";
 import { MotionReveal } from "@/components/site/motion-reveal";
-import { ProductTile } from "@/components/site/product-tile";
+import { ProductGallery } from "@/components/site/product-gallery";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { getCatalogStaticParams, getModelPage, getPublicNav } from "@/lib/queries";
@@ -72,23 +72,19 @@ export default async function ModelPage({
             Survolez une pièce pour choisir votre taille, puis ajoutez-la à votre demande.
           </MotionReveal>
         </div>
-        <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {model.products.map((product, index) => (
-            <MotionReveal key={product.id} delay={index * 0.045}>
-              <ProductTile
-                product={{
-                  id: product.id,
-                  name: product.name,
-                  color: product.color,
-                  priceText: product.priceText,
-                  imageUrl: product.imageUrl,
-                  imageAlt: product.imageAlt,
-                  modelName: model.name,
-                  sizes: product.sizes
-                }}
-              />
-            </MotionReveal>
-          ))}
+        <div className="mt-8 md:mt-10">
+          <ProductGallery
+            products={model.products.map((product) => ({
+              id: product.id,
+              name: product.name,
+              color: product.color,
+              priceText: product.priceText,
+              imageUrl: product.imageUrl,
+              imageAlt: product.imageAlt,
+              modelName: model.name,
+              sizes: product.sizes
+            }))}
+          />
         </div>
       </section>
       <SiteFooter />

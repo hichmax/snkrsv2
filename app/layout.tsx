@@ -4,6 +4,8 @@ import { Inter, Syne } from "next/font/google";
 import { CartProvider } from "@/components/site/cart-provider";
 import { CartOverlay } from "@/components/site/cart-overlay";
 import { siteContent } from "@/content/site-content";
+import { AnimatedBackground } from "@/components/site/animated-background";
+import { PageTransition } from "@/components/site/page-transition";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -44,9 +46,11 @@ export default function RootLayout({
     <html lang="fr" className={`${inter.variable} ${syne.variable}`} data-scroll-behavior="smooth">
       <body>
         <CartProvider>
+          <AnimatedBackground />
           <div className="page-noise" />
           {children}
           <CartOverlay />
+          <PageTransition />
         </CartProvider>
       </body>
     </html>

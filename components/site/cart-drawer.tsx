@@ -62,11 +62,11 @@ export function CartDrawer() {
     <>
       <button
         onClick={() => toggle(true)}
-        className="fixed bottom-5 right-5 z-50 flex items-center gap-3 rounded-full border border-white/15 bg-black/70 px-4 py-3 text-sm text-white shadow-[0_10px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl"
+        className="cart-floating-button fixed bottom-24 right-3 z-50 flex items-center gap-3 rounded-full px-4 py-3 text-sm text-white md:bottom-5 md:right-5"
       >
         <ShoppingBag className="h-4 w-4" />
         <span>{siteContent.cart.buttonLabel}</span>
-        <span className="rounded-full bg-lime-300 px-2 py-0.5 text-[11px] font-semibold text-black">
+        <span className="rounded-full bg-[var(--electric)] px-2 py-0.5 text-[11px] font-semibold text-black">
           {totalCount}
         </span>
       </button>
@@ -86,7 +86,7 @@ export function CartDrawer() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", stiffness: 260, damping: 28 }}
-              className="fixed right-0 top-0 z-[60] h-full w-full max-w-xl overflow-y-auto border-l border-white/10 bg-[#070707]/95 p-5 text-white backdrop-blur-2xl"
+              className="liquid-cart-drawer fixed right-0 top-0 z-[60] h-full w-full max-w-xl overflow-y-auto p-5 text-white"
             >
               <div className="mb-5 flex items-center justify-between">
                 <div>
@@ -120,7 +120,7 @@ export function CartDrawer() {
                   items.map((item) => (
                     <div
                       key={`${item.productId}-${item.sizeLabel || "na"}`}
-                      className="rounded-[28px] border border-white/10 bg-white/[0.04] p-4"
+                      className="liquid-cart-item rounded-[28px] p-4"
                     >
                       <div className="flex gap-4">
                         {item.imageUrl ? (
@@ -183,7 +183,7 @@ export function CartDrawer() {
                 )}
               </div>
 
-              <div className="mt-6 rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+              <div className="liquid-cart-item mt-6 rounded-[28px] p-5">
                 <p className="mb-4 text-sm text-white/60">{siteContent.cart.introText}</p>
                 <div className="grid gap-3">
                   <input
@@ -220,7 +220,7 @@ export function CartDrawer() {
                   <button
                     onClick={handleSubmit}
                     disabled={submitting || !items.length}
-                    className="rounded-full bg-lime-300 px-5 py-3 font-semibold text-black disabled:opacity-40"
+                    className="liquid-action px-5 py-3 disabled:opacity-40"
                   >
                     {submitting ? siteContent.cart.submittingLabel : siteContent.cart.submitLabel}
                   </button>

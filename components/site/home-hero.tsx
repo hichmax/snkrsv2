@@ -34,8 +34,8 @@ export function HomeHero({
             sizes="100vw"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.9)_0%,rgba(0,0,0,.56)_48%,rgba(0,0,0,.15)_100%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(0,0,0,.75)_0%,transparent_55%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,5,12,.94)_0%,rgba(3,7,17,.62)_48%,rgba(20,32,62,.12)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(2,4,10,.82)_0%,transparent_55%)]" />
         </motion.div>
 
         <div className="relative z-10 flex min-h-[calc(100svh-110px)] flex-col justify-between p-5 md:p-10 lg:p-14">
@@ -46,7 +46,7 @@ export function HomeHero({
             className="flex items-center justify-between gap-4"
           >
             <div className="hero-chip">
-              <Sparkles className="h-3.5 w-3.5 text-lime-300" />
+              <Sparkles className="h-3.5 w-3.5 text-[var(--electric)]" />
               {siteContent.home.badge}
             </div>
             <a href="#catalogue" className="hero-chip hidden sm:flex">
@@ -67,10 +67,12 @@ export function HomeHero({
               </motion.p>
             </div>
             <h1 className="hero-title">
-              {["THE", "NEXT", "OBSESSION"].map((line, index) => (
+              {["SNEAKERS", "ADDICT", "PHILOSOPHIE"].map((line, index) => (
                 <span key={line} className="block overflow-hidden">
                   <motion.span
-                    className={`block ${index === 1 ? "text-lime-300" : ""}`}
+                    className={`block ${index === 1 ? "hero-title-accent" : ""} ${
+                      index === 2 ? "hero-title-long" : ""
+                    }`}
                     initial={reducedMotion ? false : { y: "110%" }}
                     animate={reducedMotion ? {} : { y: 0 }}
                     transition={{
@@ -89,7 +91,7 @@ export function HomeHero({
               initial={reducedMotion ? false : { opacity: 0, y: 20 }}
               animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
               transition={{ delay: 0.68, duration: 0.7 }}
-              className="mt-7 flex flex-col gap-5 border-t border-white/20 pt-5 md:flex-row md:items-end md:justify-between"
+              className="hero-bottom-glass mt-7 flex flex-col gap-5 pt-5 md:flex-row md:items-end md:justify-between"
             >
               <p className="max-w-xl text-sm leading-6 text-white/65 md:text-base">
                 Sneakers, vêtements et pièces fortes sélectionnés pour sortir du lot.
