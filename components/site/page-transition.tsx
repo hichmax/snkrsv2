@@ -4,32 +4,23 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-type Phase = "idle" | "expanding" | "revealing";
-type OriginRect = {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-  scale: number;
-  radius: string;
-};
+type Phase = "idle" | "approaching" | "revealing";
 
-const fallbackOrigin: OriginRect = {
-  left: 0,
-  top: 0,
-  width: 1,
-  height: 1,
-  scale: 220,
-  radius: "32px"
-};
+const FALLBACK_SNEAKER = "/sneaker-transition-fallback.svg";
+
+function imageFromAnchor(anchor: HTMLAnchorElement) {
+  const image = anchor.querySelector<HTMLImageElement>("img");
+  return image?.currentSrc || image?.src || FALLBACK_SNEAKER;
+}
 
 export function PageTransition() {
   const pathname = usePathname();
   const router = useRouter();
   const reducedMotion = useReducedMotion();
   const [phase, setPhase] = useState<Phase>("idle");
-  const [origin, setOrigin] = useState<OriginRect>(fallbackOrigin);
+  const [imageSrc, setImageSrc] = useState(FALLBACK_SNEAKER);
   const phaseRef = useRef<Phase>("idle");
+  const sourceElement = useRef<HTMLElement | null>(null);
   const navigationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const recoveryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previousPathname = useRef(pathname);
@@ -38,13 +29,19 @@ export function PageTransition() {
     if (previousPathname.current === pathname) return;
     previousPathname.current = pathname;
 
-    if (phaseRef.current === "expanding") {
+    if (phaseRef.current === "approaching") {
+      if (navigationTimer.current) clearTimeout(navigationTimer.current);
+      if (recoveryTimer.current) clearTimeout(recoveryTimer.current);
+      navigationTimer.current = null;
+      recoveryTimer.current = null;
       phaseRef.current = "revealing";
       setPhase("revealing");
       const timer = setTimeout(() => {
+        sourceElement.current?.classList.remove("sneaker-transition-source");
+        sourceElement.current = null;
         phaseRef.current = "idle";
         setPhase("idle");
-      }, 560);
+      }, 520);
       return () => clearTimeout(timer);
     }
   }, [pathname]);
@@ -52,7 +49,6 @@ export function PageTransition() {
   useEffect(() => {
     function handleNavigation(event: MouseEvent) {
       if (
-        reducedMotion ||
         phaseRef.current !== "idle" ||
         event.defaultPrevented ||
         event.button !== 0 ||
@@ -65,47 +61,36 @@ export function PageTransition() {
       }
 
       const target = event.target as HTMLElement | null;
-      const anchor = target?.closest("a");
+      const anchor = target?.closest<HTMLAnchorElement>("a");
       if (!anchor || anchor.target === "_blank" || anchor.hasAttribute("download")) return;
 
       const url = new URL(anchor.href, window.location.href);
-      if (url.origin !== window.location.origin) return;
-      if (url.pathname.startsWith("/admin")) return;
-      if (url.pathname === window.location.pathname && url.search === window.location.search) {
+      if (url.origin !== window.location.origin || url.pathname.startsWith("/admin")) return;
+      if (url.pathname === window.location.pathname) return;
+
+      if (reducedMotion) {
         return;
       }
 
-      const originElement =
-        anchor.closest<HTMLElement>("[data-liquid-origin]") ||
-        anchor.closest<HTMLElement>(".editorial-card, .product-card, .primary-pill, .secondary-pill") ||
-        anchor;
-      const rect = originElement.getBoundingClientRect();
-      const width = Math.max(rect.width, 44);
-      const height = Math.max(rect.height, 44);
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const farthestX = Math.max(centerX, window.innerWidth - centerX);
-      const farthestY = Math.max(centerY, window.innerHeight - centerY);
-      const coverDiameter = Math.hypot(farthestX, farthestY) * 2.35;
-      const computedRadius = window.getComputedStyle(originElement).borderRadius;
-
       event.preventDefault();
-      setOrigin({
-        left: rect.left,
-        top: rect.top,
-        width,
-        height,
-        scale: Math.max(coverDiameter / Math.min(width, height), 2),
-        radius: computedRadius === "0px" ? "28px" : computedRadius
-      });
-      phaseRef.current = "expanding";
-      setPhase("expanding");
+      sourceElement.current =
+        anchor.closest<HTMLElement>("[data-transition-source]") ||
+        anchor.closest<HTMLElement>(".editorial-card, .product-card") ||
+        anchor;
+      sourceElement.current.classList.add("sneaker-transition-source");
+      setImageSrc(imageFromAnchor(anchor));
+      phaseRef.current = "approaching";
+      setPhase("approaching");
 
       navigationTimer.current = setTimeout(() => {
         router.push(`${url.pathname}${url.search}${url.hash}`);
-      }, 430);
+      }, 500);
 
       recoveryTimer.current = setTimeout(() => {
+        sourceElement.current?.classList.remove("sneaker-transition-source");
+        sourceElement.current = null;
+        navigationTimer.current = null;
+        recoveryTimer.current = null;
         phaseRef.current = "idle";
         setPhase("idle");
       }, 2200);
@@ -116,6 +101,9 @@ export function PageTransition() {
       document.removeEventListener("click", handleNavigation, true);
       if (navigationTimer.current) clearTimeout(navigationTimer.current);
       if (recoveryTimer.current) clearTimeout(recoveryTimer.current);
+      navigationTimer.current = null;
+      recoveryTimer.current = null;
+      sourceElement.current?.classList.remove("sneaker-transition-source");
     };
   }, [reducedMotion, router]);
 
@@ -123,33 +111,77 @@ export function PageTransition() {
     <AnimatePresence>
       {phase !== "idle" ? (
         <motion.div
-          className="liquid-transition-layer"
-          initial={{ opacity: 1 }}
+          className="sneaker-transition-layer"
+          initial={{ opacity: 0 }}
           animate={{ opacity: phase === "revealing" ? 0 : 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: phase === "revealing" ? 0.5 : 0.12 }}
+          transition={{ duration: phase === "revealing" ? 0.48 : 0.16 }}
           aria-hidden="true"
         >
           <motion.div
-            className="liquid-transition-organic"
-            style={{
-              left: origin.left,
-              top: origin.top,
-              width: origin.width,
-              height: origin.height,
-              borderRadius: origin.radius
-            }}
-            initial={{ scale: 1, rotate: 0 }}
-            animate={{
-              scale: phase === "expanding" ? origin.scale : origin.scale * 1.03,
-              rotate: phase === "expanding" ? 2 : -1,
-              borderRadius:
-                phase === "expanding"
-                  ? "42% 58% 63% 37% / 48% 36% 64% 52%"
-                  : "55% 45% 38% 62% / 42% 57% 43% 58%"
-            }}
-            transition={{ duration: 0.68, ease: [0.2, 0.82, 0.24, 1] }}
+            className="sneaker-transition-veil"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: phase === "approaching" ? 1 : 0 }}
+            transition={{ duration: 0.4 }}
           />
+          <div className="sneaker-transition-light sneaker-transition-light-one" />
+          <div className="sneaker-transition-light sneaker-transition-light-two" />
+          <motion.div
+            className="sneaker-transition-stage"
+            initial={{
+              opacity: 0,
+              x: "-34vw",
+              y: "16vh",
+              scale: 0.42,
+              rotateX: 18,
+              rotateY: -32,
+              rotateZ: -13
+            }}
+            animate={
+              phase === "approaching"
+                ? {
+                    opacity: 1,
+                    x: "0vw",
+                    y: "0vh",
+                    scale: 1.62,
+                    rotateX: -4,
+                    rotateY: 8,
+                    rotateZ: 5
+                  }
+                : {
+                    opacity: 0,
+                    x: "38vw",
+                    y: "-12vh",
+                    scale: 0.72,
+                    rotateX: -15,
+                    rotateY: 36,
+                    rotateZ: 14
+                  }
+            }
+            transition={{ duration: phase === "approaching" ? 0.68 : 0.48, ease: [0.2, 0.82, 0.24, 1] }}
+          >
+            <motion.div
+              className="sneaker-transition-shadow"
+              animate={{
+                opacity: phase === "approaching" ? [0.15, 0.52, 0.32] : 0,
+                scaleX: phase === "approaching" ? [0.7, 1.15, 0.9] : 0.6
+              }}
+              transition={{ duration: 0.68 }}
+            />
+            <div className="sneaker-transition-frame">
+              <img
+                src={imageSrc}
+                alt=""
+                className="sneaker-transition-image"
+                onError={(event) => {
+                  if (!event.currentTarget.src.endsWith(FALLBACK_SNEAKER)) {
+                    event.currentTarget.src = FALLBACK_SNEAKER;
+                  }
+                }}
+              />
+              <span className="sneaker-transition-reflection" />
+            </div>
+          </motion.div>
         </motion.div>
       ) : null}
     </AnimatePresence>

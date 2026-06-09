@@ -92,8 +92,8 @@ export function ProductGallery({
           desktopColumns === 4 ? "md:grid-cols-2 xl:grid-cols-4" : "md:grid-cols-2 xl:grid-cols-3"
         }`}
       >
-        {products.map((product) => (
-          <ProductTile key={product.id} product={product} />
+        {products.map((product, index) => (
+          <ProductTile key={product.id} product={product} index={index} />
         ))}
       </div>
 

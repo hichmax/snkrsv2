@@ -1198,57 +1198,102 @@ a {
     0 12px 38px rgba(92, 148, 255, 0.28);
 }
 
-.liquid-transition-layer {
+.sneaker-transition-layer {
   pointer-events: none;
   position: fixed;
   inset: 0;
   z-index: 125;
   overflow: hidden;
+  perspective: 1200px;
+  transform-style: preserve-3d;
 }
 
-.liquid-transition-organic {
+.sneaker-transition-veil {
   position: absolute;
-  border: 1px solid rgba(232, 242, 255, 0.34);
+  inset: 0;
   background:
-    radial-gradient(circle at 38% 34%, rgba(255, 255, 255, 0.42), transparent 16%),
-    radial-gradient(circle at 66% 62%, rgba(156, 123, 255, 0.24), transparent 26%),
-    linear-gradient(145deg, rgba(169, 205, 255, 0.76), rgba(5, 9, 18, 0.94) 48%, rgba(125, 95, 255, 0.72));
-  box-shadow:
-    inset 0 0 100px rgba(255, 255, 255, 0.24),
-    0 0 100px rgba(94, 150, 255, 0.38);
-  backdrop-filter: blur(38px) saturate(195%);
-  transform-origin: center;
-  will-change: transform, border-radius;
+    radial-gradient(circle at center, rgba(29, 47, 82, 0.4), transparent 34%),
+    rgba(2, 4, 10, 0.76);
+  backdrop-filter: blur(12px) saturate(125%);
 }
 
-.organic-cursor {
-  pointer-events: none;
-  position: fixed;
-  z-index: 170;
-  top: -18px;
-  left: -18px;
-  width: 36px;
-  height: 36px;
-  border: 1px solid rgba(245, 250, 255, 0.68);
-  border-radius: 48% 52% 58% 42% / 46% 42% 58% 54%;
-  background:
-    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.72), transparent 22%),
-    linear-gradient(145deg, rgba(161, 207, 255, 0.28), rgba(152, 113, 255, 0.12));
-  box-shadow:
-    inset 0 1px 4px rgba(255, 255, 255, 0.42),
-    0 0 28px rgba(111, 167, 255, 0.2);
-  backdrop-filter: blur(7px) saturate(170%);
+.sneaker-transition-light {
+  position: absolute;
+  width: min(70vw, 900px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.22;
+}
+
+.sneaker-transition-light-one {
+  top: -42%;
+  left: 12%;
+  background: #6da8ff;
+}
+
+.sneaker-transition-light-two {
+  right: 7%;
+  bottom: -55%;
+  background: #8a6bff;
+}
+
+.sneaker-transition-stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(64vw, 760px);
+  aspect-ratio: 5 / 3;
+  margin-top: calc(min(38.4vw, 456px) / -2);
+  margin-left: calc(min(64vw, 760px) / -2);
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+
+.sneaker-transition-frame {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(70px);
+  filter: drop-shadow(0 32px 38px rgba(0, 0, 0, 0.62))
+    drop-shadow(0 0 34px rgba(111, 167, 255, 0.2));
+}
+
+.sneaker-transition-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  -webkit-mask-image: radial-gradient(ellipse 76% 66% at center, black 48%, rgba(0, 0, 0, 0.88) 62%, transparent 82%);
+  mask-image: radial-gradient(ellipse 76% 66% at center, black 48%, rgba(0, 0, 0, 0.88) 62%, transparent 82%);
+  transform: translateZ(0);
+}
+
+.sneaker-transition-reflection {
+  position: absolute;
+  inset: 7% 4%;
+  background: linear-gradient(112deg, transparent 34%, rgba(255, 255, 255, 0.52) 48%, transparent 61%);
+  background-size: 240% 100%;
   mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(ellipse 76% 66% at center, black 44%, transparent 82%);
+  mask-image: radial-gradient(ellipse 76% 66% at center, black 44%, transparent 82%);
+  animation: sneaker-transition-shimmer 0.72s ease-out both;
 }
 
-.organic-cursor-interactive {
-  border-color: rgba(255, 255, 255, 0.9);
-  background:
-    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.82), transparent 22%),
-    linear-gradient(145deg, rgba(154, 204, 255, 0.48), rgba(163, 128, 255, 0.24));
-  box-shadow:
-    inset 0 1px 5px rgba(255, 255, 255, 0.58),
-    0 0 38px rgba(111, 167, 255, 0.38);
+.sneaker-transition-shadow {
+  position: absolute;
+  right: 12%;
+  bottom: -5%;
+  left: 12%;
+  height: 15%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.76);
+  filter: blur(22px);
+  transform: translateZ(-60px);
+}
+
+.sneaker-transition-source {
+  transform: translate3d(0, 0, 0) scale(0.975) !important;
+  filter: brightness(1.12) saturate(1.12);
+  transition: transform 240ms ease, filter 240ms ease;
 }
 
 .site-nav::before,
@@ -1393,6 +1438,20 @@ a {
   }
 }
 
+@keyframes sneaker-transition-shimmer {
+  from {
+    background-position: -120% 0;
+    opacity: 0;
+  }
+  35% {
+    opacity: 0.74;
+  }
+  to {
+    background-position: 120% 0;
+    opacity: 0;
+  }
+}
+
 @media (min-width: 1024px) {
   .mobile-bottom-nav {
     display: none !important;
@@ -1427,6 +1486,25 @@ a {
 }
 
 @media (max-width: 767px) {
+  .sneaker-transition-layer {
+    perspective: 900px;
+  }
+
+  .sneaker-transition-veil {
+    backdrop-filter: blur(6px) saturate(115%);
+  }
+
+  .sneaker-transition-stage {
+    width: 88vw;
+    margin-top: -26.4vw;
+    margin-left: -44vw;
+  }
+
+  .sneaker-transition-frame {
+    filter: drop-shadow(0 22px 28px rgba(0, 0, 0, 0.62))
+      drop-shadow(0 0 22px rgba(111, 167, 255, 0.16));
+  }
+
   .floating-action-cluster {
     right: 12px !important;
     bottom: calc(92px + env(safe-area-inset-bottom)) !important;
@@ -1511,12 +1589,6 @@ a {
 
   .product-card .opacity-0 {
     opacity: 1;
-  }
-}
-
-@media (pointer: coarse) {
-  .organic-cursor {
-    display: none;
   }
 }
 

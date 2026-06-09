@@ -14,6 +14,7 @@ type SizeItem = {
 };
 
 type ProductTileProps = {
+  index?: number;
   product: {
     id: string;
     name: string;
@@ -26,7 +27,7 @@ type ProductTileProps = {
   };
 };
 
-export function ProductTile({ product }: ProductTileProps) {
+export function ProductTile({ product, index = 0 }: ProductTileProps) {
   const reducedMotion = useReducedMotion();
   const [selectedSize, setSelectedSize] = useState<string | undefined>(
     product.sizes.find((size) => size.isAvailable)?.sizeLabel
@@ -35,8 +36,11 @@ export function ProductTile({ product }: ProductTileProps) {
 
   return (
     <motion.article
+      initial={reducedMotion ? false : { opacity: 0, y: 26, scale: 0.985 }}
+      whileInView={reducedMotion ? {} : { opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-50px" }}
       whileHover={reducedMotion ? undefined : { y: -7 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.52, delay: Math.min(index * 0.035, 0.24), ease: [0.2, 0.82, 0.24, 1] }}
       className="product-card group"
     >
       <div className="relative aspect-[4/5] overflow-hidden">
