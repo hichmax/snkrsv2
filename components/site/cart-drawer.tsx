@@ -1,8 +1,9 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ShoppingBag, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ShoppingBag, Trash2, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { useCart } from "@/components/site/cart-provider";
 import { siteContent } from "@/content/site-content";
 
@@ -17,10 +18,38 @@ export function CartDrawer() {
   const [snapchat, setSnapchat] = useState("");
   const [city, setCity] = useState("");
   const [note, setNote] = useState("");
+  const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const totalCount = useMemo(
     () => items.reduce((sum, item) => sum + item.quantity, 0),
     [items]
   );
+
+  useEffect(() => {
+    setMounted(true);
+    const media = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobile(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") toggle(false);
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, toggle]);
 
   async function handleSubmit() {
     if (!items.length || !customerName.trim()) return;
@@ -58,48 +87,80 @@ export function CartDrawer() {
     setFeedback({ type: "success", text: siteContent.cart.successText });
   }
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <>
-      <button
-        onClick={() => toggle(true)}
-        className="cart-floating-button fixed bottom-24 right-3 z-[130] flex items-center gap-3 rounded-full px-4 py-3 text-sm text-white md:bottom-5 md:right-5"
-      >
-        <ShoppingBag className="h-4 w-4" />
-        <span>{siteContent.cart.buttonLabel}</span>
-        <span className="rounded-full bg-[var(--electric)] px-2 py-0.5 text-[11px] font-semibold text-black">
-          {totalCount}
-        </span>
-      </button>
+      <AnimatePresence>
+        {!isOpen ? (
+          <motion.div
+            className="floating-action-cluster"
+            initial={{ opacity: 0, y: 18, scale: 0.92 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.94 }}
+          >
+            <button
+              onClick={() => toggle(true)}
+              className="cart-floating-button"
+              aria-label={`Ouvrir le panier, ${totalCount} article${totalCount > 1 ? "s" : ""}`}
+            >
+              <span className="cart-floating-icon">
+                <ShoppingBag />
+              </span>
+              <span className="cart-floating-label">{siteContent.cart.buttonLabel}</span>
+              <span className="cart-floating-count">{totalCount}</span>
+            </button>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
       <AnimatePresence>
         {isOpen ? (
-          <>
+          <div className="cart-overlay-root" role="presentation">
             <motion.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => toggle(false)}
-              className="cart-drawer-backdrop fixed inset-0 z-[140] bg-black/72"
+              className="cart-drawer-backdrop"
+              aria-label="Fermer le panier"
             />
             <motion.aside
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
+              initial={{
+                opacity: 0,
+                x: isMobile ? 0 : "105%",
+                y: isMobile ? "105%" : 0,
+                scale: 0.98
+              }}
+              animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+              exit={{
+                opacity: 0,
+                x: isMobile ? 0 : "105%",
+                y: isMobile ? "105%" : 0,
+                scale: 0.98
+              }}
               transition={{ type: "spring", stiffness: 260, damping: 28 }}
-              className="liquid-cart-drawer fixed right-0 top-0 z-[150] h-full w-full max-w-xl overflow-y-auto p-5 text-white"
+              className="liquid-cart-drawer"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="cart-drawer-title"
             >
-              <div className="mb-5 flex items-center justify-between">
+              <div className="cart-sheet-handle" />
+              <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs uppercase tracking-[0.35em] text-white/45">
                     {siteContent.cart.drawerEyebrow}
                   </p>
-                  <h2 className="text-2xl font-semibold">{siteContent.cart.drawerTitle}</h2>
+                  <h2 id="cart-drawer-title" className="text-2xl font-semibold">
+                    {siteContent.cart.drawerTitle}
+                  </h2>
                 </div>
                 <button
                   onClick={() => toggle(false)}
-                  className="rounded-full border border-white/10 px-4 py-2 text-sm text-white/70"
+                  className="cart-close-button"
+                  aria-label={siteContent.cart.closeLabel}
                 >
-                  {siteContent.cart.closeLabel}
+                  <X className="h-4 w-4" />
                 </button>
               </div>
 
@@ -227,9 +288,10 @@ export function CartDrawer() {
                 </div>
               </div>
             </motion.aside>
-          </>
+          </div>
         ) : null}
       </AnimatePresence>
-    </>
+    </>,
+    document.body
   );
 }

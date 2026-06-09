@@ -6,6 +6,7 @@ import { CartOverlay } from "@/components/site/cart-overlay";
 import { siteContent } from "@/content/site-content";
 import { AnimatedBackground } from "@/components/site/animated-background";
 import { PageTransition } from "@/components/site/page-transition";
+import { OrganicCursorFollower } from "@/components/site/organic-cursor-follower";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -51,6 +52,7 @@ export default function RootLayout({
           {children}
           <CartOverlay />
           <PageTransition />
+          <OrganicCursorFollower />
         </CartProvider>
       </body>
     </html>

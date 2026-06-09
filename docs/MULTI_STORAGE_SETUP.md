@@ -1,5 +1,9 @@
 # Configuration multi-stockage
 
+Le guide détaillé et à jour se trouve dans
+[`docs/IMAGE_HOSTING_PROVIDERS.md`](./IMAGE_HOSTING_PROVIDERS.md). Le code accepte
+`R2_BUCKET` comme nom recommandé et conserve `R2_BUCKET_NAME` comme alias historique.
+
 Le studio d'upload permet de choisir, image par image ou lot par lot :
 
 - **Cloudflare R2** : stockage principal recommandé pour le catalogue ;

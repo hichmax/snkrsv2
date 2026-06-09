@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -45,66 +46,74 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
+  const addItem = useCallback((item: CartItem) => {
+    setItems((current) => {
+      const existingIndex = current.findIndex(
+        (entry) => entry.productId === item.productId && entry.sizeLabel === item.sizeLabel
+      );
+
+      if (existingIndex >= 0) {
+        const clone = [...current];
+        clone[existingIndex] = {
+          ...clone[existingIndex],
+          quantity: clone[existingIndex].quantity + item.quantity
+        };
+        return clone;
+      }
+
+      return [...current, item];
+    });
+    setIsOpen(true);
+  }, []);
+
+  const removeItem = useCallback((productId: string, sizeLabel?: string) => {
+    setItems((current) =>
+      current.filter(
+        (entry) => !(entry.productId === productId && entry.sizeLabel === sizeLabel)
+      )
+    );
+  }, []);
+
+  const updateQuantity = useCallback(
+    (productId: string, sizeLabel: string | undefined, quantity: number) => {
+      if (quantity <= 0) {
+        setItems((current) =>
+          current.filter(
+            (entry) => !(entry.productId === productId && entry.sizeLabel === sizeLabel)
+          )
+        );
+        return;
+      }
+
+      setItems((current) =>
+        current.map((entry) =>
+          entry.productId === productId && entry.sizeLabel === sizeLabel
+            ? { ...entry, quantity }
+            : entry
+        )
+      );
+    },
+    []
+  );
+
+  const clear = useCallback(() => setItems([]), []);
+  const toggle = useCallback(
+    (value?: boolean) =>
+      setIsOpen((current) => (typeof value === "boolean" ? value : !current)),
+    []
+  );
+
   const value = useMemo<CartContextValue>(
     () => ({
       items,
       isOpen,
-      addItem(item) {
-        setItems((current) => {
-          const existingIndex = current.findIndex(
-            (entry) =>
-              entry.productId === item.productId &&
-              entry.sizeLabel === item.sizeLabel
-          );
-
-          if (existingIndex >= 0) {
-            const clone = [...current];
-            clone[existingIndex] = {
-              ...clone[existingIndex],
-              quantity: clone[existingIndex].quantity + item.quantity
-            };
-            return clone;
-          }
-
-          return [...current, item];
-        });
-        setIsOpen(true);
-      },
-      removeItem(productId, sizeLabel) {
-        setItems((current) =>
-          current.filter(
-            (entry) =>
-              !(entry.productId === productId && entry.sizeLabel === sizeLabel)
-          )
-        );
-      },
-      updateQuantity(productId, sizeLabel, quantity) {
-        if (quantity <= 0) {
-          setItems((current) =>
-            current.filter(
-              (entry) =>
-                !(entry.productId === productId && entry.sizeLabel === sizeLabel)
-            )
-          );
-          return;
-        }
-
-        setItems((current) =>
-          current.map((entry) =>
-            entry.productId === productId && entry.sizeLabel === sizeLabel
-              ? { ...entry, quantity }
-              : entry
-          )
-        );
-      },
-      clear() {
-        setItems([]);
-      },
-      toggle(value) {
-        setIsOpen((current) => (typeof value === "boolean" ? value : !current));
-      }
+      addItem,
+      removeItem,
+      updateQuantity,
+      clear,
+      toggle
     }),
-    [items, isOpen]
+    [addItem, clear, isOpen, items, removeItem, toggle, updateQuantity]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

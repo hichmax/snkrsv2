@@ -5,13 +5,30 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 type Phase = "idle" | "expanding" | "revealing";
+type OriginRect = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  scale: number;
+  radius: string;
+};
+
+const fallbackOrigin: OriginRect = {
+  left: 0,
+  top: 0,
+  width: 1,
+  height: 1,
+  scale: 220,
+  radius: "32px"
+};
 
 export function PageTransition() {
   const pathname = usePathname();
   const router = useRouter();
   const reducedMotion = useReducedMotion();
   const [phase, setPhase] = useState<Phase>("idle");
-  const [origin, setOrigin] = useState({ x: 0, y: 0 });
+  const [origin, setOrigin] = useState<OriginRect>(fallbackOrigin);
   const phaseRef = useRef<Phase>("idle");
   const navigationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const recoveryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -58,8 +75,29 @@ export function PageTransition() {
         return;
       }
 
+      const originElement =
+        anchor.closest<HTMLElement>("[data-liquid-origin]") ||
+        anchor.closest<HTMLElement>(".editorial-card, .product-card, .primary-pill, .secondary-pill") ||
+        anchor;
+      const rect = originElement.getBoundingClientRect();
+      const width = Math.max(rect.width, 44);
+      const height = Math.max(rect.height, 44);
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const farthestX = Math.max(centerX, window.innerWidth - centerX);
+      const farthestY = Math.max(centerY, window.innerHeight - centerY);
+      const coverDiameter = Math.hypot(farthestX, farthestY) * 2.35;
+      const computedRadius = window.getComputedStyle(originElement).borderRadius;
+
       event.preventDefault();
-      setOrigin({ x: event.clientX, y: event.clientY });
+      setOrigin({
+        left: rect.left,
+        top: rect.top,
+        width,
+        height,
+        scale: Math.max(coverDiameter / Math.min(width, height), 2),
+        radius: computedRadius === "0px" ? "28px" : computedRadius
+      });
       phaseRef.current = "expanding";
       setPhase("expanding");
 
@@ -93,14 +131,24 @@ export function PageTransition() {
           aria-hidden="true"
         >
           <motion.div
-            className="liquid-transition-bubble"
-            style={{ left: origin.x, top: origin.y }}
-            initial={{ scale: 0.008, rotate: -8 }}
-            animate={{
-              scale: phase === "expanding" ? 1 : 1.08,
-              rotate: phase === "expanding" ? 0 : 3
+            className="liquid-transition-organic"
+            style={{
+              left: origin.left,
+              top: origin.top,
+              width: origin.width,
+              height: origin.height,
+              borderRadius: origin.radius
             }}
-            transition={{ duration: 0.62, ease: [0.2, 0.82, 0.24, 1] }}
+            initial={{ scale: 1, rotate: 0 }}
+            animate={{
+              scale: phase === "expanding" ? origin.scale : origin.scale * 1.03,
+              rotate: phase === "expanding" ? 2 : -1,
+              borderRadius:
+                phase === "expanding"
+                  ? "42% 58% 63% 37% / 48% 36% 64% 52%"
+                  : "55% 45% 38% 62% / 42% 57% 43% 58%"
+            }}
+            transition={{ duration: 0.68, ease: [0.2, 0.82, 0.24, 1] }}
           />
         </motion.div>
       ) : null}

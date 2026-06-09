@@ -34,7 +34,7 @@ export function EditorialCard({
       whileHover={reducedMotion ? undefined : { y: -10, scale: 1.012 }}
       className="group"
     >
-      <Link href={href} className="editorial-card">
+      <Link href={href} className="editorial-card" data-liquid-origin data-cursor-interactive>
         <div
           className={`relative overflow-hidden ${
             aspect === "portrait" ? "aspect-[4/5]" : "aspect-[16/11]"
