@@ -1210,102 +1210,157 @@ a {
     0 12px 38px rgba(92, 148, 255, 0.28);
 }
 
-.sneaker-transition-layer {
+.ribbon-transition-layer {
   pointer-events: none;
   position: fixed;
   inset: 0;
   z-index: 125;
   overflow: hidden;
-  perspective: 1200px;
+  perspective: 1400px;
   transform-style: preserve-3d;
 }
 
-.sneaker-transition-veil {
+.ribbon-transition-veil {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at center, rgba(29, 47, 82, 0.4), transparent 34%),
-    rgba(2, 4, 10, 0.76);
-  backdrop-filter: blur(12px) saturate(125%);
+    linear-gradient(90deg, rgba(2, 4, 10, 0.36), rgba(8, 14, 27, 0.72) 55%, rgba(2, 4, 10, 0.62)),
+    radial-gradient(circle at 70% 50%, rgba(92, 144, 255, 0.34), transparent 42%);
+  backdrop-filter: blur(10px) saturate(130%);
 }
 
-.sneaker-transition-light {
-  position: absolute;
-  width: min(70vw, 900px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  filter: blur(70px);
-  opacity: 0.22;
-}
-
-.sneaker-transition-light-one {
-  top: -42%;
-  left: 12%;
-  background: #6da8ff;
-}
-
-.sneaker-transition-light-two {
-  right: 7%;
-  bottom: -55%;
-  background: #8a6bff;
-}
-
-.sneaker-transition-stage {
+.ribbon-transition-stage {
   position: absolute;
   top: 50%;
-  left: 50%;
-  width: min(64vw, 760px);
-  aspect-ratio: 5 / 3;
-  margin-top: calc(min(38.4vw, 456px) / -2);
-  margin-left: calc(min(64vw, 760px) / -2);
+  left: 0;
+  width: 165vw;
+  height: 110vh;
+  margin-top: -55vh;
   transform-style: preserve-3d;
   will-change: transform, opacity;
 }
 
-.sneaker-transition-frame {
+.ribbon-transition-trail {
   position: absolute;
-  inset: 0;
-  transform: translateZ(70px);
-  filter: drop-shadow(0 32px 38px rgba(0, 0, 0, 0.62))
-    drop-shadow(0 0 34px rgba(111, 167, 255, 0.2));
-}
-
-.sneaker-transition-image {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  -webkit-mask-image: radial-gradient(ellipse 76% 66% at center, black 48%, rgba(0, 0, 0, 0.88) 62%, transparent 82%);
-  mask-image: radial-gradient(ellipse 76% 66% at center, black 48%, rgba(0, 0, 0, 0.88) 62%, transparent 82%);
-  transform: translateZ(0);
-}
-
-.sneaker-transition-reflection {
-  position: absolute;
-  inset: 7% 4%;
-  background: linear-gradient(112deg, transparent 34%, rgba(255, 255, 255, 0.52) 48%, transparent 61%);
-  background-size: 240% 100%;
-  mix-blend-mode: screen;
-  -webkit-mask-image: radial-gradient(ellipse 76% 66% at center, black 44%, transparent 82%);
-  mask-image: radial-gradient(ellipse 76% 66% at center, black 44%, transparent 82%);
-  animation: sneaker-transition-shimmer 0.72s ease-out both;
-}
-
-.sneaker-transition-shadow {
-  position: absolute;
-  right: 12%;
-  bottom: -5%;
-  left: 12%;
-  height: 15%;
+  top: 38%;
+  right: -5%;
+  left: -5%;
+  height: 25%;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.76);
-  filter: blur(22px);
-  transform: translateZ(-60px);
+  background: linear-gradient(90deg, rgba(87, 144, 255, 0.05), rgba(141, 102, 255, 0.34), rgba(244, 126, 194, 0.2), rgba(84, 146, 255, 0.06));
+  filter: blur(54px);
+  opacity: 0.82;
+  transform: translateZ(-190px);
 }
 
-.sneaker-transition-source {
+.ribbon-transition-segment {
+  position: absolute;
+  display: block;
+  overflow: hidden;
+  border: 1px solid rgba(248, 250, 255, 0.58);
+  border-radius: clamp(9px, 1vw, 18px);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.72),
+    inset -8px 0 18px rgba(0, 0, 0, 0.28),
+    10px 18px 34px rgba(0, 0, 0, 0.42),
+    0 0 34px rgba(102, 158, 255, 0.24);
+  transform-style: preserve-3d;
+  backface-visibility: visible;
+  backdrop-filter: blur(18px) saturate(185%);
+}
+
+.ribbon-transition-segment::before {
+  position: absolute;
+  content: "";
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 12% 3%, rgba(255, 255, 255, 0.82), transparent 30%),
+    linear-gradient(110deg, transparent 26%, rgba(255, 255, 255, 0.48) 48%, transparent 65%);
+  background-size: 100% 100%, 240% 100%;
+  animation: ribbon-glint 0.76s ease-out both;
+}
+
+.ribbon-transition-segment::after {
+  position: absolute;
+  content: "";
+  top: 5px;
+  right: -8px;
+  bottom: 5px;
+  width: 8px;
+  border-radius: 0 6px 6px 0;
+  background: rgba(10, 13, 24, 0.72);
+  box-shadow: inset 1px 0 1px rgba(255, 255, 255, 0.42);
+  transform: rotateY(70deg);
+  transform-origin: left center;
+}
+
+.ribbon-segment-blue {
+  background: linear-gradient(145deg, rgba(118, 190, 255, 0.9), rgba(38, 87, 187, 0.58) 52%, rgba(12, 19, 40, 0.94));
+}
+
+.ribbon-segment-pink {
+  background: linear-gradient(145deg, rgba(255, 159, 222, 0.92), rgba(176, 64, 139, 0.56) 52%, rgba(40, 13, 36, 0.94));
+}
+
+.ribbon-segment-violet {
+  background: linear-gradient(145deg, rgba(194, 153, 255, 0.9), rgba(95, 56, 177, 0.56) 52%, rgba(24, 13, 45, 0.94));
+}
+
+.ribbon-segment-silver {
+  background: linear-gradient(145deg, rgba(246, 250, 255, 0.92), rgba(133, 164, 210, 0.54) 52%, rgba(16, 22, 35, 0.94));
+}
+
+.ribbon-transition-glint {
+  position: absolute;
+  top: 20%;
+  bottom: 20%;
+  left: 48%;
+  width: 12%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.38), transparent);
+  filter: blur(18px);
+  mix-blend-mode: screen;
+  transform: translateZ(260px) skewX(-20deg);
+  animation: ribbon-glint-pass 0.68s ease-out both;
+}
+
+.ribbon-transition-fragment {
+  position: absolute;
+  display: block;
+  border: 1px solid rgba(240, 247, 255, 0.42);
+  border-radius: 18px;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.58),
+    0 20px 50px rgba(0, 0, 0, 0.34),
+    0 0 30px rgba(111, 167, 255, 0.18);
+  backdrop-filter: blur(20px) saturate(180%);
+  will-change: transform, opacity;
+}
+
+.ribbon-transition-fragment-1 {
+  background: rgba(146, 197, 255, 0.42);
+}
+
+.ribbon-transition-fragment-2 {
+  background: rgba(190, 151, 255, 0.38);
+}
+
+.ribbon-transition-fragment-3 {
+  background: rgba(238, 247, 255, 0.32);
+}
+
+.ribbon-transition-fragment-4 {
+  background: rgba(193, 255, 153, 0.28);
+}
+
+.ribbon-transition-source {
   transform: translate3d(0, 0, 0) scale(0.975) !important;
-  filter: brightness(1.12) saturate(1.12);
+  filter: brightness(1.1) saturate(1.08);
   transition: transform 240ms ease, filter 240ms ease;
+}
+
+.ribbon-page-entering main {
+  animation: ribbon-page-enter 0.68s cubic-bezier(0.2, 0.82, 0.24, 1) both;
 }
 
 .site-nav::before,
@@ -1450,7 +1505,7 @@ a {
   }
 }
 
-@keyframes sneaker-transition-shimmer {
+@keyframes ribbon-glint {
   from {
     background-position: -120% 0;
     opacity: 0;
@@ -1461,6 +1516,33 @@ a {
   to {
     background-position: 120% 0;
     opacity: 0;
+  }
+}
+
+@keyframes ribbon-glint-pass {
+  from {
+    opacity: 0;
+    transform: translate3d(90%, 0, 260px) skewX(-20deg);
+  }
+  42% {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(-180%, 0, 260px) skewX(-20deg);
+  }
+}
+
+@keyframes ribbon-page-enter {
+  from {
+    opacity: 0.7;
+    transform: translate3d(0, 0, 0) scale(1.025);
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
   }
 }
 
@@ -1528,23 +1610,30 @@ a {
 }
 
 @media (max-width: 767px) {
-  .sneaker-transition-layer {
-    perspective: 900px;
+  .ribbon-transition-layer {
+    perspective: 800px;
   }
 
-  .sneaker-transition-veil {
-    backdrop-filter: blur(6px) saturate(115%);
+  .ribbon-transition-veil {
+    backdrop-filter: blur(4px) saturate(112%);
   }
 
-  .sneaker-transition-stage {
-    width: 88vw;
-    margin-top: -26.4vw;
-    margin-left: -44vw;
+  .ribbon-transition-stage {
+    width: 235vw;
+    height: 96vh;
+    margin-top: -48vh;
   }
 
-  .sneaker-transition-frame {
-    filter: drop-shadow(0 22px 28px rgba(0, 0, 0, 0.62))
-      drop-shadow(0 0 22px rgba(111, 167, 255, 0.16));
+  .ribbon-transition-segment {
+    border-radius: 8px;
+    backdrop-filter: blur(9px) saturate(145%);
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.48),
+      7px 12px 24px rgba(0, 0, 0, 0.36);
+  }
+
+  .ribbon-transition-fragment:nth-of-type(n + 6) {
+    display: none;
   }
 
   .floating-action-cluster {
