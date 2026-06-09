@@ -86,7 +86,7 @@ export function SiteHeader({ nav }: { nav: NavItem[] }) {
         </motion.div>
       </header>
 
-      <nav className="mobile-bottom-nav" aria-label="Navigation mobile">
+      <nav className="mobile-bottom-nav" aria-label="Navigation principale flottante">
         <Link
           href="/"
           onClick={() => setActiveDock("home")}
