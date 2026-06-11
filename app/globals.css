@@ -383,14 +383,20 @@ a {
   inset: 0;
 }
 
+.sa-hero-spline-fallback,
+.sa-hero-spline-vignette {
+  pointer-events: none;
+}
+
 .sa-hero-spline-crop {
   inset: -11% -15% -11% 4%;
-  pointer-events: none;
+  pointer-events: auto;
   transform: translate3d(12%, -1%, 0) scale(1.14);
   transform-origin: 64% 48%;
 }
 
 .sa-hero-spline-canvas {
+  pointer-events: auto;
   will-change: transform, opacity;
 }
 
@@ -398,6 +404,7 @@ a {
 .sa-hero-spline-canvas canvas {
   width: 100% !important;
   height: 100% !important;
+  pointer-events: auto !important;
 }
 
 .sa-hero-spline-vignette {
@@ -405,6 +412,15 @@ a {
   background:
     linear-gradient(90deg, rgba(2, 5, 12, 0.96) 0%, rgba(3, 7, 17, 0.7) 42%, rgba(7, 13, 28, 0.08) 78%),
     linear-gradient(0deg, rgba(2, 4, 10, 0.88) 0%, transparent 52%);
+}
+
+.hero-content-layer {
+  pointer-events: none;
+}
+
+.hero-content-layer a,
+.hero-content-layer button {
+  pointer-events: auto;
 }
 
 .catalog-title {
@@ -1748,8 +1764,15 @@ a {
 
   .sa-hero-spline-crop {
     inset: -4% -72% -4% -30%;
+    pointer-events: none;
     transform: translate3d(12%, -3%, 0) scale(1.04);
     transform-origin: 62% 48%;
+  }
+
+  .sa-hero-spline-canvas,
+  .sa-hero-spline-canvas > div,
+  .sa-hero-spline-canvas canvas {
+    pointer-events: none !important;
   }
 
   .sa-hero-spline-vignette {

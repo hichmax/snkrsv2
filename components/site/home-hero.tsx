@@ -22,7 +22,7 @@ export function HomeHero({
       <div className="hero-shell mx-auto max-w-[1500px]">
         <HeroSplineScene fallbackImage={image} />
 
-        <div className="relative z-10 flex min-h-[calc(100svh-110px)] flex-col justify-between p-5 md:p-10 lg:p-14">
+        <div className="hero-content-layer relative z-10 flex min-h-[calc(100svh-110px)] flex-col justify-between p-5 md:p-10 lg:p-14">
           <motion.div
             initial={reducedMotion ? false : { opacity: 0, y: 16 }}
             animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
