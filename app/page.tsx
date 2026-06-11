@@ -54,7 +54,6 @@ export default async function HomePage() {
               title={category.name}
               meta={`${category.brands.length} marques à découvrir`}
               index={index}
-              aspect={index === 0 ? "landscape" : "portrait"}
             />
           ))}
         </div>

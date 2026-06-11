@@ -159,6 +159,9 @@ export function OrdersManager({ orders }: { orders: Order[] }) {
                     ) : null}
                     <div>
                       <p className="text-sm font-medium">{item.modelName}</p>
+                      <p className="mt-1 truncate text-xs text-white/55" title={item.productName}>
+                        Fichier : {item.productName}
+                      </p>
                       <p className="mt-1 text-xs text-white/45">
                         Taille : {item.sizeLabel || "à préciser"} · Qté : {item.quantity}
                       </p>

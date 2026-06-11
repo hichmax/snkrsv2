@@ -77,7 +77,6 @@ export default async function CategoryPage({
               title={brand.name}
               meta={`${brand.models.length} modèles visibles`}
               index={index}
-              aspect={index % 3 === 0 ? "landscape" : "portrait"}
             />
           ))}
         </div>

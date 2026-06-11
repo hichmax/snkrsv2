@@ -12,8 +12,7 @@ export function EditorialCard({
   eyebrow,
   title,
   meta,
-  index = 0,
-  aspect = "portrait"
+  index = 0
 }: {
   href: string;
   image: string;
@@ -21,7 +20,6 @@ export function EditorialCard({
   title: string;
   meta: string;
   index?: number;
-  aspect?: "portrait" | "landscape";
 }) {
   const reducedMotion = useReducedMotion();
 
@@ -35,20 +33,12 @@ export function EditorialCard({
       className="group"
     >
       <Link href={href} className="editorial-card" data-transition-source>
-        <div
-          className={`relative overflow-hidden ${
-            aspect === "portrait" ? "aspect-[4/5]" : "aspect-[16/11]"
-          }`}
-        >
+        <div className="editorial-card-media relative aspect-[16/10] overflow-hidden md:aspect-[16/9]">
           <ResilientImage
             src={image}
             alt={title}
             fill
-            sizes={
-              aspect === "portrait"
-                ? "(max-width: 768px) 100vw, 33vw"
-                : "(max-width: 768px) 100vw, 50vw"
-            }
+            sizes="(max-width: 768px) 100vw, 50vw"
             className="scale-[1.08] object-cover transition-transform duration-700 ease-out group-hover:scale-[1.14]"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />

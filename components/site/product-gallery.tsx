@@ -150,7 +150,7 @@ export function ProductGallery({
               <div className="p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <p className="eyebrow">{selected.color || selected.name}</p>
+                    <p className="eyebrow">{selected.color || "Variation disponible"}</p>
                     <AutoFitText
                       as="h3"
                       maxLines={2}

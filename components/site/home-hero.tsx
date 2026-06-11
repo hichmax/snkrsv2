@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowDownRight, ArrowUpRight, Sparkles } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { siteContent } from "@/content/site-content";
-import { ResilientImage } from "@/components/site/resilient-image";
+import { HeroSplineScene } from "@/components/site/hero-spline-scene";
 
 export function HomeHero({
   image,
@@ -20,23 +20,7 @@ export function HomeHero({
   return (
     <section className="relative px-3 pb-8 pt-3 md:px-6 md:pt-5">
       <div className="hero-shell mx-auto max-w-[1500px]">
-        <motion.div
-          initial={reducedMotion ? false : { opacity: 0, scale: 1.025 }}
-          animate={reducedMotion ? {} : { opacity: 1, scale: 1 }}
-          transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute inset-0"
-        >
-          <ResilientImage
-            src={image}
-            alt="Sélection Sneakers Addict"
-            fill
-            priority
-            sizes="100vw"
-            className="scale-[1.06] object-cover"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,5,12,.94)_0%,rgba(3,7,17,.62)_48%,rgba(20,32,62,.12)_100%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(2,4,10,.82)_0%,transparent_55%)]" />
-        </motion.div>
+        <HeroSplineScene fallbackImage={image} />
 
         <div className="relative z-10 flex min-h-[calc(100svh-110px)] flex-col justify-between p-5 md:p-10 lg:p-14">
           <motion.div
@@ -70,9 +54,9 @@ export function HomeHero({
               {["SNEAKERS", "ADDICT", "PHILOSOPHIE"].map((line, index) => (
                 <span key={line} className="block overflow-hidden">
                   <motion.span
-                    className={`block ${index === 1 ? "hero-title-accent" : ""} ${
-                      index === 2 ? "hero-title-long" : ""
-                    }`}
+                    className={`block ${index === 0 ? "hero-title-no-shadow" : ""} ${
+                      index === 1 ? "hero-title-accent" : ""
+                    } ${index === 2 ? "hero-title-long" : ""}`}
                     initial={reducedMotion ? false : { y: "110%" }}
                     animate={reducedMotion ? {} : { y: 0 }}
                     transition={{

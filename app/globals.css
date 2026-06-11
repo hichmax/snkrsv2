@@ -338,12 +338,16 @@ a {
 }
 
 .hero-title {
-  max-width: 1100px;
-  font-size: clamp(4.2rem, 13.4vw, 12.5rem);
+  max-width: 780px;
+  font-size: clamp(3.2rem, 8vw, 7.4rem);
   font-weight: 700;
   letter-spacing: -0.095em;
-  line-height: 0.76;
+  line-height: 0.79;
   text-shadow: 0 14px 50px rgba(0, 0, 0, 0.3);
+}
+
+.hero-title .hero-title-no-shadow {
+  text-shadow: none;
 }
 
 .hero-title-accent,
@@ -357,8 +361,50 @@ a {
 }
 
 .hero-title-long {
-  font-size: 0.62em;
+  font-size: 0.58em;
   letter-spacing: -0.07em;
+}
+
+.sa-hero-spline-stage {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 74% 40%, rgba(106, 151, 255, 0.16), transparent 38%),
+    #050810;
+}
+
+.sa-hero-spline-fallback,
+.sa-hero-spline-crop,
+.sa-hero-spline-canvas,
+.sa-hero-spline-vignette {
+  position: absolute;
+  inset: 0;
+}
+
+.sa-hero-spline-crop {
+  inset: -11% -15% -11% 4%;
+  pointer-events: none;
+  transform: translate3d(12%, -1%, 0) scale(1.14);
+  transform-origin: 64% 48%;
+}
+
+.sa-hero-spline-canvas {
+  will-change: transform, opacity;
+}
+
+.sa-hero-spline-canvas > div,
+.sa-hero-spline-canvas canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.sa-hero-spline-vignette {
+  z-index: 2;
+  background:
+    linear-gradient(90deg, rgba(2, 5, 12, 0.96) 0%, rgba(3, 7, 17, 0.7) 42%, rgba(7, 13, 28, 0.08) 78%),
+    linear-gradient(0deg, rgba(2, 4, 10, 0.88) 0%, transparent 52%);
 }
 
 .catalog-title {
@@ -1690,13 +1736,26 @@ a {
   }
 
   .hero-title {
-    font-size: clamp(3.3rem, 17vw, 5rem);
-    line-height: 0.8;
+    max-width: 94%;
+    font-size: clamp(2.45rem, 12vw, 3.7rem);
+    line-height: 0.83;
   }
 
   .hero-title-long {
-    font-size: 0.5em;
+    font-size: 0.46em;
     letter-spacing: -0.045em;
+  }
+
+  .sa-hero-spline-crop {
+    inset: -4% -72% -4% -30%;
+    transform: translate3d(12%, -3%, 0) scale(1.04);
+    transform-origin: 62% 48%;
+  }
+
+  .sa-hero-spline-vignette {
+    background:
+      linear-gradient(90deg, rgba(2, 5, 12, 0.9) 0%, rgba(3, 7, 17, 0.58) 58%, rgba(7, 13, 28, 0.08) 100%),
+      linear-gradient(0deg, rgba(2, 4, 10, 0.9) 0%, transparent 58%);
   }
 
   .catalog-title {

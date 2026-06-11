@@ -82,7 +82,7 @@ export function ProductTile({ product, index = 0 }: ProductTileProps) {
       <div className="flex items-end justify-between gap-4 p-4">
         <div className="min-w-0">
           <p className="truncate text-xs uppercase tracking-[0.2em] text-white/35">
-            {product.color || product.name}
+            {product.color || "Variation disponible"}
           </p>
           <AutoFitText
             as="h3"
