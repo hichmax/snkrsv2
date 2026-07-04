@@ -74,6 +74,7 @@ export default async function ModelPage({
         </div>
         <div className="mt-8 md:mt-10">
           <ProductGallery
+            mode="modal"
             products={model.products.map((product) => ({
               id: product.id,
               name: product.name,

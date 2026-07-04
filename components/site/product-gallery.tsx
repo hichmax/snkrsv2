@@ -25,15 +25,18 @@ type GalleryProduct = {
 
 export function ProductGallery({
   products,
-  desktopColumns = 3
+  desktopColumns = 3,
+  mode = "responsive"
 }: {
   products: GalleryProduct[];
   desktopColumns?: 3 | 4;
+  mode?: "responsive" | "modal";
 }) {
   const reducedMotion = useReducedMotion();
   const { addItem } = useCart();
   const [selected, setSelected] = useState<GalleryProduct | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | undefined>();
+  const modalOnly = mode === "modal";
 
   useEffect(() => {
     if (!selected) return;
@@ -56,7 +59,7 @@ export function ProductGallery({
 
   return (
     <>
-      <div className="mobile-product-grid md:hidden">
+      <div className={modalOnly ? "interactive-product-grid" : "mobile-product-grid md:hidden"}>
         {products.map((product, index) => (
           <motion.button
             key={product.id}
@@ -87,20 +90,22 @@ export function ProductGallery({
         ))}
       </div>
 
-      <div
-        className={`hidden gap-4 md:grid ${
-          desktopColumns === 4 ? "md:grid-cols-2 xl:grid-cols-4" : "md:grid-cols-2 xl:grid-cols-3"
-        }`}
-      >
-        {products.map((product, index) => (
-          <ProductTile key={product.id} product={product} index={index} />
-        ))}
-      </div>
+      {!modalOnly ? (
+        <div
+          className={`hidden gap-4 md:grid ${
+            desktopColumns === 4 ? "md:grid-cols-2 xl:grid-cols-4" : "md:grid-cols-2 xl:grid-cols-3"
+          }`}
+        >
+          {products.map((product, index) => (
+            <ProductTile key={product.id} product={product} index={index} />
+          ))}
+        </div>
+      ) : null}
 
       <AnimatePresence>
         {selected ? (
           <motion.div
-            className="mobile-product-modal md:hidden"
+            className={`mobile-product-modal ${modalOnly ? "" : "md:hidden"}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

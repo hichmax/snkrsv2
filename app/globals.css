@@ -391,12 +391,14 @@ a {
 .sa-hero-spline-crop {
   inset: -11% -15% -11% 4%;
   pointer-events: auto;
+  touch-action: pan-y;
   transform: translate3d(12%, -1%, 0) scale(1.14);
   transform-origin: 64% 48%;
 }
 
 .sa-hero-spline-canvas {
   pointer-events: auto;
+  overscroll-behavior: contain;
   will-change: transform, opacity;
 }
 
@@ -405,6 +407,7 @@ a {
   width: 100% !important;
   height: 100% !important;
   pointer-events: auto !important;
+  touch-action: pan-y !important;
 }
 
 .sa-hero-spline-vignette {
@@ -1144,6 +1147,12 @@ a {
   gap: 6px;
 }
 
+.interactive-product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(6px, 1vw, 12px);
+}
+
 .mobile-product-thumb {
   position: relative;
   aspect-ratio: 1;
@@ -1838,6 +1847,26 @@ a {
 
   .section-title {
     font-size: clamp(2.9rem, 14vw, 4.4rem);
+  }
+}
+
+@media (min-width: 768px) {
+  .interactive-product-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .interactive-product-grid .mobile-product-thumb {
+    border-radius: 22px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .interactive-product-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .mobile-product-sheet {
+    width: min(760px, calc(100vw - 48px));
   }
 }
 

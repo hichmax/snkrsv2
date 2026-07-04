@@ -14,11 +14,24 @@ export const HERO_SPLINE_SCENE =
 
 export function HeroSplineScene({ fallbackImage }: { fallbackImage: string }) {
   const reducedMotion = useReducedMotion();
-  const [shouldLoad, setShouldLoad] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [needsMotionPermission, setNeedsMotionPermission] = useState(false);
   const [motionEnabled, setMotionEnabled] = useState(false);
   const canvasHostRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const host = canvasHostRef.current;
+    if (!host) return;
+
+    function blockSplineWheelZoom(event: globalThis.WheelEvent) {
+      event.stopPropagation();
+    }
+
+    host.addEventListener("wheel", blockSplineWheelZoom, { capture: true, passive: true });
+    return () => {
+      host.removeEventListener("wheel", blockSplineWheelZoom, { capture: true });
+    };
+  }, []);
 
   function dispatchSplinePointer(clientX: number, clientY: number, source?: PointerEvent) {
     const canvas = canvasHostRef.current?.querySelector("canvas");
@@ -40,12 +53,6 @@ export function HeroSplineScene({ fallbackImage }: { fallbackImage: string }) {
       })
     );
   }
-
-  useEffect(() => {
-    const delay = window.matchMedia("(max-width: 767px)").matches ? 650 : 120;
-    const timer = window.setTimeout(() => setShouldLoad(true), delay);
-    return () => window.clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     if (!isReady || reducedMotion) return;
@@ -167,23 +174,21 @@ export function HeroSplineScene({ fallbackImage }: { fallbackImage: string }) {
         />
       </motion.div>
 
-      {shouldLoad ? (
-        <div className="sa-hero-spline-crop absolute">
-          <motion.div
-            ref={canvasHostRef}
-            className="sa-hero-spline-canvas absolute inset-0"
-            initial={reducedMotion ? false : { opacity: 0, scale: 0.96 }}
-            animate={{ opacity: isReady ? 1 : 0, scale: 1 }}
-            transition={{ duration: reducedMotion ? 0 : 0.8, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <Spline
-              scene={HERO_SPLINE_SCENE}
-              renderOnDemand
-              onLoad={() => setIsReady(true)}
-            />
-          </motion.div>
-        </div>
-      ) : null}
+      <div className="sa-hero-spline-crop absolute">
+        <motion.div
+          ref={canvasHostRef}
+          className="sa-hero-spline-canvas absolute inset-0"
+          initial={reducedMotion ? false : { opacity: 0, scale: 0.96 }}
+          animate={{ opacity: isReady ? 1 : 0, scale: 1 }}
+          transition={{ duration: reducedMotion ? 0 : 0.45, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <Spline
+            scene={HERO_SPLINE_SCENE}
+            renderOnDemand
+            onLoad={() => setIsReady(true)}
+          />
+        </motion.div>
+      </div>
 
       <div className="sa-hero-spline-vignette absolute inset-0 z-[2]" />
       {needsMotionPermission ? (
