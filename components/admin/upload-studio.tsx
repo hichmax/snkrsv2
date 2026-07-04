@@ -59,6 +59,28 @@ async function responseError(response: Response, fallback: string) {
   return data?.error || fallback;
 }
 
+function providerUploadError(provider: PreparedUpload["provider"], error: unknown) {
+  const message = error instanceof Error ? error.message : "";
+
+  if (provider === "CLOUDFLARE_R2") {
+    return new Error(
+      message && message !== "Failed to fetch"
+        ? `Cloudflare R2 a refuse l'image : ${message}`
+        : "Cloudflare R2 est injoignable depuis le navigateur. Verifiez le CORS du bucket R2, le domaine public et les cles API."
+    );
+  }
+
+  if (provider === "SUPABASE") {
+    return new Error(
+      message
+        ? `Supabase Storage a refuse l'image : ${message}`
+        : "Supabase Storage a refuse l'image. Verifiez le bucket, la cle anon et la signature d'upload."
+    );
+  }
+
+  return error instanceof Error ? error : new Error("Upload impossible.");
+}
+
 export function UploadStudio({ categories, brands, models }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [providers, setProviders] = useState<StorageProviderStatus[]>([]);
@@ -150,7 +172,7 @@ export function UploadStudio({ categories, brands, models }: Props) {
       formData.append("file", file);
       Object.entries(prepared.fields).forEach(([key, value]) => formData.append(key, value));
       const response = await fetch(prepared.uploadUrl, { method: "POST", body: formData });
-      if (!response.ok) throw new Error("Cloudinary a refusé l'image.");
+      if (!response.ok) throw new Error("Cloudinary a refuse l'image.");
       const result = await response.json();
       return {
         url: String(result.secure_url),
@@ -159,27 +181,37 @@ export function UploadStudio({ categories, brands, models }: Props) {
     }
 
     if (prepared.provider === "CLOUDFLARE_R2") {
-      const response = await fetch(prepared.uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": file.type },
-        body: file
-      });
-      if (!response.ok) throw new Error("Cloudflare R2 a refusé l'image.");
-      return { url: prepared.publicUrl, storageKey: prepared.storageKey };
+      try {
+        const response = await fetch(prepared.uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": file.type },
+          body: file
+        });
+        if (!response.ok) {
+          throw new Error(`${response.status} ${response.statusText}`.trim());
+        }
+        return { url: prepared.publicUrl, storageKey: prepared.storageKey };
+      } catch (error) {
+        throw providerUploadError(prepared.provider, error);
+      }
     }
 
-    const supabase = createClient(
-      prepared.fields.supabaseUrl,
-      prepared.fields.supabaseAnonKey
-    );
-    const { error } = await supabase.storage
-      .from(prepared.fields.bucket)
-      .uploadToSignedUrl(prepared.storageKey, prepared.fields.token, file, {
-        contentType: file.type
-      });
+    try {
+      const supabase = createClient(
+        prepared.fields.supabaseUrl,
+        prepared.fields.supabaseAnonKey
+      );
+      const { error } = await supabase.storage
+        .from(prepared.fields.bucket)
+        .uploadToSignedUrl(prepared.storageKey, prepared.fields.token, file, {
+          contentType: file.type
+        });
 
-    if (error) throw new Error(error.message);
-    return { url: prepared.publicUrl, storageKey: prepared.storageKey };
+      if (error) throw new Error(error.message);
+      return { url: prepared.publicUrl, storageKey: prepared.storageKey };
+    } catch (error) {
+      throw providerUploadError(prepared.provider, error);
+    }
   }
 
   async function uploadOne(item: QueueItem) {
@@ -317,6 +349,11 @@ export function UploadStudio({ categories, brands, models }: Props) {
                   {selected ? <Check className="h-4 w-4 text-lime-300" /> : null}
                 </div>
                 <p className="mt-1 min-h-10 text-xs leading-5 text-white/45">{provider.note}</p>
+                {!provider.configured && provider.missingRequirements.length ? (
+                  <p className="mt-3 rounded-2xl border border-amber-300/15 bg-amber-300/[0.06] px-3 py-2 text-[11px] leading-5 text-amber-100/80">
+                    Manquant : {provider.missingRequirements.join(", ")}
+                  </p>
+                ) : null}
                 <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/8">
                   <div
                     className="h-full rounded-full bg-lime-300 transition-[width] duration-700"

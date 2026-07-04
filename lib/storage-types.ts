@@ -10,6 +10,7 @@ export type StorageProviderStatus = {
   id: StorageProviderId;
   label: string;
   configured: boolean;
+  missingRequirements: string[];
   usedBytes: number;
   limitBytes: number | null;
   assetCount: number;

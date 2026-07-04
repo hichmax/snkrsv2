@@ -42,12 +42,63 @@ const fragments = [
   { left: "90%", top: "72%", width: 72, height: 102, x: "-142vw", y: 72, rotate: 44, delay: 0.07 }
 ];
 
+function normalizeImageUrl(value: string | null | undefined) {
+  if (!value || value.startsWith("data:") || value.startsWith("blob:")) return null;
+
+  try {
+    return new URL(value, window.location.href).href;
+  } catch {
+    return null;
+  }
+}
+
+function extractBackgroundImageUrl(element: Element) {
+  const backgroundImage = window.getComputedStyle(element).backgroundImage;
+  const match = backgroundImage.match(/url\(["']?([^"')]+)["']?\)/);
+  return normalizeImageUrl(match?.[1]);
+}
+
+function collectTransitionImages(source: HTMLElement | null) {
+  const images = new Set<string>();
+
+  function addFrom(root: ParentNode | null) {
+    if (!root) return;
+
+    root.querySelectorAll<HTMLImageElement>("img").forEach((image) => {
+      const url = normalizeImageUrl(image.currentSrc || image.src);
+      if (url) images.add(url);
+    });
+
+    if (root instanceof Element) {
+      const backgroundUrl = extractBackgroundImageUrl(root);
+      if (backgroundUrl) images.add(backgroundUrl);
+    }
+  }
+
+  addFrom(source);
+
+  if (images.size < 3) {
+    document
+      .querySelectorAll<HTMLElement>(
+        ".editorial-card, .product-card, .mobile-product-thumb, .catalog-hero, .hero-shell"
+      )
+      .forEach((element) => addFrom(element));
+  }
+
+  return Array.from(images).slice(0, 8);
+}
+
+function imageBackground(imageUrl: string) {
+  return { backgroundImage: `url("${imageUrl.replace(/"/g, "%22")}")` };
+}
+
 export function RibbonPageTransition() {
   const pathname = usePathname();
   const router = useRouter();
   const reducedMotion = useReducedMotion();
   const [phase, setPhase] = useState<Phase>("idle");
   const [compactMotion, setCompactMotion] = useState(false);
+  const [transitionImages, setTransitionImages] = useState<string[]>([]);
   const phaseRef = useRef<Phase>("idle");
   const sourceElement = useRef<HTMLElement | null>(null);
   const navigationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -80,6 +131,7 @@ export function RibbonPageTransition() {
       const revealTimer = setTimeout(() => {
         sourceElement.current?.classList.remove("ribbon-transition-source");
         sourceElement.current = null;
+        setTransitionImages([]);
         phaseRef.current = "idle";
         setPhase("idle");
       }, compactMotion ? 420 : 580);
@@ -126,6 +178,7 @@ export function RibbonPageTransition() {
         anchor.closest<HTMLElement>(".editorial-card, .product-card") ||
         anchor;
       sourceElement.current.classList.add("ribbon-transition-source");
+      setTransitionImages(collectTransitionImages(sourceElement.current));
       phaseRef.current = "covering";
       setPhase("covering");
 
@@ -136,6 +189,7 @@ export function RibbonPageTransition() {
       recoveryTimer.current = setTimeout(() => {
         sourceElement.current?.classList.remove("ribbon-transition-source");
         sourceElement.current = null;
+        setTransitionImages([]);
         navigationTimer.current = null;
         recoveryTimer.current = null;
         phaseRef.current = "idle";
@@ -190,94 +244,113 @@ export function RibbonPageTransition() {
             <div className="ribbon-transition-trail" />
             {segments
               .filter((segment) => !compactMotion || segment.index % 2 === 0)
-              .map((segment) => (
-              <motion.span
-                key={segment.index}
-                className={`ribbon-transition-segment ${segment.className}`}
-                style={{
-                  left: segment.left,
-                  top: segment.top,
-                  width: segment.width,
-                  height: segment.height
-                }}
-                initial={{
-                  opacity: 0,
-                  x: "-50%",
-                  y: "-50%",
-                  z: segment.depth - 110,
-                  rotateX: segment.rotateX - 18,
-                  rotateY: segment.rotateY - 16,
-                  rotateZ: segment.rotateZ
-                }}
-                animate={
-                  phase === "covering"
-                    ? {
-                        opacity: 1,
-                        x: [
-                          "-50%",
-                          `calc(-50% + ${segment.sway}px)`,
-                          `calc(-50% - ${Math.round(segment.sway * 0.7)}px)`,
-                          "-50%"
-                        ],
-                        y: [
-                          "-50%",
-                          `calc(-50% - ${segment.float}px)`,
-                          `calc(-50% + ${Math.round(segment.float * 0.6)}px)`,
-                          "-50%"
-                        ],
-                        z: [segment.depth - 24, segment.depth + 54, segment.depth - 8, segment.depth - 24],
-                        rotateX: [
-                          segment.rotateX - 8,
-                          segment.rotateX + 13,
-                          segment.rotateX - 5,
-                          segment.rotateX - 8
-                        ],
-                        rotateY: [
-                          segment.rotateY - 16,
-                          segment.rotateY + 22,
-                          segment.rotateY - 12,
-                          segment.rotateY - 16
-                        ],
-                        rotateZ: [
-                          segment.rotateZ - 4,
-                          segment.rotateZ + 6,
-                          segment.rotateZ - 2,
-                          segment.rotateZ - 4
-                        ]
-                      }
-                    : {
-                        opacity: 0.78,
-                        x: "-50%",
-                        y: `calc(-50% + ${(segment.index % 2 === 0 ? -1 : 1) * segment.float * 2}px)`,
-                        z: segment.depth + 90,
-                        rotateX: segment.rotateX + (segment.index % 2 === 0 ? -24 : 24),
-                        rotateY: segment.rotateY + (segment.index % 3 === 0 ? 36 : -28),
-                        rotateZ: segment.rotateZ + (segment.index % 2 === 0 ? -18 : 18)
-                      }
-                }
-                transition={
-                  phase === "covering"
-                    ? {
-                        duration: segment.duration,
-                        delay: segment.index * 0.008,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }
-                    : {
-                        duration: compactMotion ? 0.28 : 0.42,
-                        delay: compactMotion ? 0 : (segment.index % 6) * 0.012,
-                        ease: [0.2, 0.82, 0.24, 1]
-                      }
-                }
-              />
-            ))}
+              .map((segment) => {
+                const imageUrl =
+                  transitionImages.length &&
+                  (segment.index % 2 === 0 || (segment.index > 15 && segment.index < 28))
+                    ? transitionImages[segment.index % transitionImages.length]
+                    : null;
+
+                return (
+                  <motion.span
+                    key={segment.index}
+                    className={`ribbon-transition-segment ${imageUrl ? "ribbon-transition-segment-media" : ""} ${segment.className}`}
+                    style={{
+                      left: segment.left,
+                      top: segment.top,
+                      width: segment.width,
+                      height: segment.height
+                    }}
+                    initial={{
+                      opacity: 0,
+                      x: "-50%",
+                      y: "-50%",
+                      z: segment.depth - 110,
+                      rotateX: segment.rotateX - 18,
+                      rotateY: segment.rotateY - 16,
+                      rotateZ: segment.rotateZ
+                    }}
+                    animate={
+                      phase === "covering"
+                        ? {
+                            opacity: 1,
+                            x: [
+                              "-50%",
+                              `calc(-50% + ${segment.sway}px)`,
+                              `calc(-50% - ${Math.round(segment.sway * 0.7)}px)`,
+                              "-50%"
+                            ],
+                            y: [
+                              "-50%",
+                              `calc(-50% - ${segment.float}px)`,
+                              `calc(-50% + ${Math.round(segment.float * 0.6)}px)`,
+                              "-50%"
+                            ],
+                            z: [
+                              segment.depth - 24,
+                              segment.depth + 54,
+                              segment.depth - 8,
+                              segment.depth - 24
+                            ],
+                            rotateX: [
+                              segment.rotateX - 8,
+                              segment.rotateX + 13,
+                              segment.rotateX - 5,
+                              segment.rotateX - 8
+                            ],
+                            rotateY: [
+                              segment.rotateY - 16,
+                              segment.rotateY + 22,
+                              segment.rotateY - 12,
+                              segment.rotateY - 16
+                            ],
+                            rotateZ: [
+                              segment.rotateZ - 4,
+                              segment.rotateZ + 6,
+                              segment.rotateZ - 2,
+                              segment.rotateZ - 4
+                            ]
+                          }
+                        : {
+                            opacity: 0.78,
+                            x: "-50%",
+                            y: `calc(-50% + ${(segment.index % 2 === 0 ? -1 : 1) * segment.float * 2}px)`,
+                            z: segment.depth + 90,
+                            rotateX: segment.rotateX + (segment.index % 2 === 0 ? -24 : 24),
+                            rotateY: segment.rotateY + (segment.index % 3 === 0 ? 36 : -28),
+                            rotateZ: segment.rotateZ + (segment.index % 2 === 0 ? -18 : 18)
+                          }
+                    }
+                    transition={
+                      phase === "covering"
+                        ? {
+                            duration: segment.duration,
+                            delay: segment.index * 0.008,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }
+                        : {
+                            duration: compactMotion ? 0.28 : 0.42,
+                            delay: compactMotion ? 0 : (segment.index % 6) * 0.012,
+                            ease: [0.2, 0.82, 0.24, 1]
+                          }
+                    }
+                  >
+                    {imageUrl ? (
+                      <span className="ribbon-transition-image" style={imageBackground(imageUrl)} />
+                    ) : null}
+                  </motion.span>
+                );
+              })}
             <span className="ribbon-transition-glint" />
           </motion.div>
 
           {fragments.map((fragment, index) => (
             <motion.span
               key={`${fragment.left}-${fragment.top}`}
-              className={`ribbon-transition-fragment ribbon-transition-fragment-${(index % 4) + 1}`}
+              className={`ribbon-transition-fragment ${
+                transitionImages.length ? "ribbon-transition-fragment-media" : ""
+              } ribbon-transition-fragment-${(index % 4) + 1}`}
               style={{
                 left: fragment.left,
                 top: fragment.top,
@@ -301,7 +374,14 @@ export function RibbonPageTransition() {
                 delay: compactMotion ? 0 : fragment.delay,
                 ease: [0.2, 0.82, 0.24, 1]
               }}
-            />
+            >
+              {transitionImages.length ? (
+                <span
+                  className="ribbon-transition-image"
+                  style={imageBackground(transitionImages[index % transitionImages.length])}
+                />
+              ) : null}
+            </motion.span>
           ))}
         </motion.div>
       ) : null}

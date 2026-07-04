@@ -54,33 +54,45 @@ function r2Endpoint() {
   );
 }
 
-export function isProviderConfigured(provider: StorageProviderId) {
+function supabaseUrl() {
+  return process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+}
+
+function missingProviderRequirements(provider: StorageProviderId) {
   if (provider === "CLOUDINARY") {
-    return Boolean(
-      process.env.CLOUDINARY_CLOUD_NAME &&
-        process.env.CLOUDINARY_API_KEY &&
-        process.env.CLOUDINARY_API_SECRET
-    );
+    return [
+      ["CLOUDINARY_CLOUD_NAME", process.env.CLOUDINARY_CLOUD_NAME],
+      ["CLOUDINARY_API_KEY", process.env.CLOUDINARY_API_KEY],
+      ["CLOUDINARY_API_SECRET", process.env.CLOUDINARY_API_SECRET]
+    ]
+      .filter(([, value]) => !value)
+      .map(([name]) => name);
   }
 
   if (provider === "CLOUDFLARE_R2") {
-    return Boolean(
-      process.env.R2_ACCOUNT_ID &&
-        process.env.R2_ACCESS_KEY_ID &&
-        process.env.R2_SECRET_ACCESS_KEY &&
-        r2Bucket() &&
-        r2Endpoint() &&
-        process.env.R2_PUBLIC_BASE_URL
-    );
+    return [
+      ["R2_ACCESS_KEY_ID", process.env.R2_ACCESS_KEY_ID],
+      ["R2_SECRET_ACCESS_KEY", process.env.R2_SECRET_ACCESS_KEY],
+      ["R2_BUCKET ou R2_BUCKET_NAME", r2Bucket()],
+      ["R2_ENDPOINT ou R2_ACCOUNT_ID", r2Endpoint()],
+      ["R2_PUBLIC_BASE_URL", process.env.R2_PUBLIC_BASE_URL]
+    ]
+      .filter(([, value]) => !value)
+      .map(([name]) => name);
   }
 
-  return Boolean(
-    process.env.SUPABASE_URL &&
-      process.env.SUPABASE_SERVICE_ROLE_KEY &&
-      process.env.SUPABASE_STORAGE_BUCKET &&
-      process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
+  return [
+    ["SUPABASE_URL ou NEXT_PUBLIC_SUPABASE_URL", supabaseUrl()],
+    ["SUPABASE_SERVICE_ROLE_KEY", process.env.SUPABASE_SERVICE_ROLE_KEY],
+    ["SUPABASE_STORAGE_BUCKET", process.env.SUPABASE_STORAGE_BUCKET],
+    ["NEXT_PUBLIC_SUPABASE_ANON_KEY", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY]
+  ]
+    .filter(([, value]) => !value)
+    .map(([name]) => name);
+}
+
+export function isProviderConfigured(provider: StorageProviderId) {
+  return missingProviderRequirements(provider).length === 0;
 }
 
 function configureCloudinary() {
@@ -105,7 +117,7 @@ function r2Client() {
 
 function supabaseAdmin() {
   return createClient(
-    process.env.SUPABASE_URL || "",
+    supabaseUrl(),
     process.env.SUPABASE_SERVICE_ROLE_KEY || "",
     {
       auth: { autoRefreshToken: false, persistSession: false }
@@ -251,7 +263,8 @@ export async function getStorageProviderStatuses(): Promise<StorageProviderStatu
     usedBytes: trackedByProvider.get(id)?.usedBytes || 0,
     limitBytes: providerLimit(id),
     assetCount: trackedByProvider.get(id)?.assetCount || 0,
-    note: notes[id]
+    note: notes[id],
+    missingRequirements: missingProviderRequirements(id)
   }));
 
   const cloudinaryStatus = statuses.find((item) => item.id === "CLOUDINARY");
