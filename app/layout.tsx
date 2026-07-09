@@ -5,7 +5,7 @@ import { CartProvider } from "@/components/site/cart-provider";
 import { CartOverlay } from "@/components/site/cart-overlay";
 import { siteContent } from "@/content/site-content";
 import { AnimatedBackground } from "@/components/site/animated-background";
-import { RibbonPageTransition } from "@/components/site/ribbon-page-transition";
+import { BubblePageTransition } from "@/components/site/bubble-page-transition";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -50,7 +50,7 @@ export default function RootLayout({
           <div className="page-noise" />
           {children}
           <CartOverlay />
-          <RibbonPageTransition />
+          <BubblePageTransition />
         </CartProvider>
       </body>
     </html>

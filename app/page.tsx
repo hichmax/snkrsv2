@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight, MoveRight, ShieldCheck, Sparkles, Zap } from "lucide-react";
 import { EditorialCard } from "@/components/site/editorial-card";
-import { HomeHero } from "@/components/site/home-hero";
+import { LiquidSneakersHome } from "@/components/site/liquid-sneakers-home";
 import { Marquee } from "@/components/site/marquee";
 import { MotionReveal } from "@/components/site/motion-reveal";
 import { ProductGallery } from "@/components/site/product-gallery";
@@ -14,20 +14,40 @@ export const revalidate = 300;
 const fallback =
   "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1800&q=85";
 
+function homeDateLabel() {
+  return new Intl.DateTimeFormat("fr-FR", {
+    timeZone: "Europe/Paris",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  })
+    .format(new Date())
+    .replaceAll("/", " / ");
+}
+
 export default async function HomePage() {
   const { categories, featured, productCount } = await getHomeData();
   const nav = categories.slice(0, 5).map((category) => ({
     label: category.name,
     href: `/catalog/${category.slug}`
   }));
+  const liquidCategories = categories.map((category) => ({
+    id: category.id,
+    name: category.name,
+    slug: category.slug,
+    accent: category.accent,
+    heroImage: category.heroImage,
+    brandCount: category.brands.length,
+    modelCount: category.brands.reduce((total, brand) => total + brand.models.length, 0)
+  }));
 
   return (
     <main>
       <SiteHeader nav={nav} />
-      <HomeHero
-        image={featured[0]?.imageUrl || categories[0]?.heroImage || fallback}
-        categoryCount={categories.length}
+      <LiquidSneakersHome
+        categories={liquidCategories}
         productCount={productCount}
+        dateLabel={homeDateLabel()}
       />
 
       <Marquee />
