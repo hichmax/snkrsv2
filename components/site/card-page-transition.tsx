@@ -8,7 +8,7 @@ type Phase = "idle" | "covering" | "revealing";
 type Direction = "forward" | "back";
 
 const desktopStripCount = 18;
-const mobileStripCount = 11;
+const mobileStripCount = 8;
 const stripPalette = [
   "linear-gradient(180deg, rgba(210,255,108,0.92), rgba(110,188,255,0.54), rgba(5,7,13,0.94))",
   "linear-gradient(180deg, rgba(168,205,255,0.9), rgba(112,91,255,0.48), rgba(4,6,12,0.96))",
@@ -243,11 +243,19 @@ export function CardPageTransition() {
             <div className="card-transition-brand-anchor">
               <motion.div
                 className="card-transition-brand"
-                initial={{ opacity: 0, y: 14, scale: 0.96, filter: "blur(8px)" }}
+                initial={
+                  compactMotion
+                    ? { opacity: 0, y: 12, scale: 0.98 }
+                    : { opacity: 0, y: 14, scale: 0.96, filter: "blur(8px)" }
+                }
                 animate={
                   phase === "covering"
-                    ? { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }
-                    : { opacity: 0, y: -12, scale: 0.985, filter: "blur(8px)" }
+                    ? compactMotion
+                      ? { opacity: 1, y: 0, scale: 1 }
+                      : { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }
+                    : compactMotion
+                      ? { opacity: 0, y: -10, scale: 0.99 }
+                      : { opacity: 0, y: -12, scale: 0.985, filter: "blur(8px)" }
                 }
                 transition={{
                   duration: phase === "covering" ? 0.24 : 0.16,

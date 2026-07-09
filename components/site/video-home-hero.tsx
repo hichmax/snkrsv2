@@ -36,7 +36,7 @@ export function VideoHomeHero({
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="auto"
         aria-hidden="true"
       />
       <div className="video-home-scrim" />
@@ -48,8 +48,8 @@ export function VideoHomeHero({
       <div className="video-home-content">
         <motion.p
           className="video-home-kicker"
-          initial={reducedMotion ? false : { opacity: 0, y: 14, filter: "blur(10px)" }}
-          animate={reducedMotion ? {} : { opacity: 1, y: 0, filter: "blur(0px)" }}
+          initial={reducedMotion ? false : { opacity: 0, y: 14 }}
+          animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
           transition={{ duration: 0.58, ease: [0.22, 1, 0.36, 1] }}
         >
           Private sneakers catalogue

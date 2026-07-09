@@ -44,6 +44,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${inter.variable} ${syne.variable}`} data-scroll-behavior="smooth">
+      <head>
+        <link rel="preconnect" href="https://d8j0ntlcm91z4.cloudfront.net" />
+        <link rel="dns-prefetch" href="//d8j0ntlcm91z4.cloudfront.net" />
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="//res.cloudinary.com" />
+      </head>
       <body>
         <CartProvider>
           <AnimatedBackground />
