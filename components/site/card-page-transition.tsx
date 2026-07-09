@@ -5,97 +5,24 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 type Phase = "idle" | "covering" | "revealing";
+type Direction = "forward" | "back";
 
-const panels = [
-  {
-    key: "media",
-    className: "card-transition-panel-media",
-    initial: { x: "-42vw", y: "108vh", rotate: -9, scale: 0.94 },
-    cover: { x: "-19vw", y: "9vh", rotate: -2, scale: 1 },
-    reveal: { x: "-68vw", y: "-96vh", rotate: -12, scale: 0.96 },
-    delay: 0
-  },
-  {
-    key: "acid",
-    className: "card-transition-panel-acid",
-    initial: { x: "52vw", y: "102vh", rotate: 10, scale: 0.96 },
-    cover: { x: "18vw", y: "7vh", rotate: 3, scale: 1 },
-    reveal: { x: "72vw", y: "-102vh", rotate: 14, scale: 0.98 },
-    delay: 0.04
-  },
-  {
-    key: "dark",
-    className: "card-transition-panel-dark",
-    initial: { x: "0vw", y: "114vh", rotate: 0, scale: 0.9 },
-    cover: { x: "0vw", y: "2vh", rotate: 0, scale: 1 },
-    reveal: { x: "0vw", y: "-116vh", rotate: -3, scale: 1 },
-    delay: 0.08
-  },
-  {
-    key: "ice",
-    className: "card-transition-panel-ice",
-    initial: { x: "-56vw", y: "122vh", rotate: 12, scale: 0.9 },
-    cover: { x: "-28vw", y: "54vh", rotate: 4, scale: 1 },
-    reveal: { x: "-82vw", y: "-72vh", rotate: 18, scale: 0.98 },
-    delay: 0.1
-  },
-  {
-    key: "violet",
-    className: "card-transition-panel-violet",
-    initial: { x: "60vw", y: "118vh", rotate: -12, scale: 0.92 },
-    cover: { x: "28vw", y: "58vh", rotate: -5, scale: 1 },
-    reveal: { x: "84vw", y: "-74vh", rotate: -20, scale: 0.98 },
-    delay: 0.12
-  }
+const desktopStripCount = 18;
+const mobileStripCount = 11;
+const stripPalette = [
+  "linear-gradient(180deg, rgba(210,255,108,0.92), rgba(110,188,255,0.54), rgba(5,7,13,0.94))",
+  "linear-gradient(180deg, rgba(168,205,255,0.9), rgba(112,91,255,0.48), rgba(4,6,12,0.96))",
+  "linear-gradient(180deg, rgba(242,248,255,0.78), rgba(122,183,255,0.44), rgba(5,7,13,0.95))",
+  "linear-gradient(180deg, rgba(143,255,206,0.82), rgba(83,127,255,0.44), rgba(4,6,12,0.96))",
+  "linear-gradient(180deg, rgba(192,158,255,0.78), rgba(92,160,255,0.46), rgba(5,7,13,0.96))"
 ];
 
-function normalizeImageUrl(value: string | null | undefined) {
-  if (!value || value.startsWith("data:") || value.startsWith("blob:")) return null;
-
-  try {
-    return new URL(value, window.location.href).href;
-  } catch {
-    return null;
-  }
+function getPathDepth(pathname: string) {
+  return pathname.split("/").filter(Boolean).length;
 }
 
-function extractBackgroundImageUrl(element: Element) {
-  const backgroundImage = window.getComputedStyle(element).backgroundImage;
-  const match = backgroundImage.match(/url\(["']?([^"')]+)["']?\)/);
-  return normalizeImageUrl(match?.[1]);
-}
-
-function collectTransitionImage(source: HTMLElement | null) {
-  const roots: ParentNode[] = [];
-
-  if (source) roots.push(source);
-
-  document
-    .querySelectorAll<HTMLElement>(
-      ".editorial-card, .product-card, .mobile-product-thumb, .catalog-hero, .video-home-hero"
-    )
-    .forEach((element) => roots.push(element));
-
-  for (const root of roots) {
-    const image = root.querySelector<HTMLImageElement>("img");
-    const imageUrl = normalizeImageUrl(image?.currentSrc || image?.src);
-    if (imageUrl) return imageUrl;
-
-    if (root instanceof Element) {
-      const backgroundUrl = extractBackgroundImageUrl(root);
-      if (backgroundUrl) return backgroundUrl;
-    }
-  }
-
-  return null;
-}
-
-function getSourceElement(anchor: HTMLAnchorElement) {
-  return (
-    anchor.closest<HTMLElement>("[data-transition-source]") ||
-    anchor.closest<HTMLElement>(".editorial-card, .product-card, .mobile-product-thumb, .video-home-action") ||
-    anchor
-  );
+function getNavigationDirection(nextPathname: string) {
+  return getPathDepth(nextPathname) < getPathDepth(window.location.pathname) ? "back" : "forward";
 }
 
 export function CardPageTransition() {
@@ -103,11 +30,10 @@ export function CardPageTransition() {
   const router = useRouter();
   const reducedMotion = useReducedMotion();
   const [phase, setPhase] = useState<Phase>("idle");
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [direction, setDirection] = useState<Direction>("forward");
   const [compactMotion, setCompactMotion] = useState(false);
   const phaseRef = useRef<Phase>("idle");
   const previousPathname = useRef(pathname);
-  const sourceElement = useRef<HTMLElement | null>(null);
   const navigationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const recoveryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -121,6 +47,8 @@ export function CardPageTransition() {
 
   useEffect(() => {
     if (previousPathname.current === pathname) return;
+    const previous = previousPathname.current;
+    const routeDirection = getPathDepth(pathname) < getPathDepth(previous) ? "back" : "forward";
     previousPathname.current = pathname;
 
     const root = document.documentElement;
@@ -136,15 +64,35 @@ export function CardPageTransition() {
       setPhase("revealing");
 
       const revealTimer = setTimeout(() => {
-        sourceElement.current?.classList.remove("card-transition-source");
-        sourceElement.current = null;
-        setImageUrl(null);
         phaseRef.current = "idle";
         setPhase("idle");
-      }, compactMotion ? 420 : 560);
+      }, compactMotion ? 260 : 340);
 
       return () => {
         clearTimeout(entranceTimer);
+        clearTimeout(revealTimer);
+        root.classList.remove("card-page-entering");
+      };
+    }
+
+    if (!reducedMotion) {
+      setDirection(routeDirection);
+      phaseRef.current = "covering";
+      setPhase("covering");
+
+      const coverTimer = setTimeout(() => {
+        phaseRef.current = "revealing";
+        setPhase("revealing");
+      }, compactMotion ? 170 : 230);
+
+      const revealTimer = setTimeout(() => {
+        phaseRef.current = "idle";
+        setPhase("idle");
+      }, compactMotion ? 440 : 560);
+
+      return () => {
+        clearTimeout(entranceTimer);
+        clearTimeout(coverTimer);
         clearTimeout(revealTimer);
         root.classList.remove("card-page-entering");
       };
@@ -154,7 +102,27 @@ export function CardPageTransition() {
       clearTimeout(entranceTimer);
       root.classList.remove("card-page-entering");
     };
-  }, [compactMotion, pathname]);
+  }, [compactMotion, pathname, reducedMotion]);
+
+  useEffect(() => {
+    function startHistoryTransition() {
+      if (phaseRef.current !== "idle" || reducedMotion) return;
+
+      setDirection("back");
+      phaseRef.current = "covering";
+      setPhase("covering");
+
+      recoveryTimer.current = setTimeout(() => {
+        navigationTimer.current = null;
+        recoveryTimer.current = null;
+        phaseRef.current = "idle";
+        setPhase("idle");
+      }, 1100);
+    }
+
+    window.addEventListener("popstate", startHistoryTransition);
+    return () => window.removeEventListener("popstate", startHistoryTransition);
+  }, [reducedMotion]);
 
   useEffect(() => {
     function handleNavigation(event: MouseEvent) {
@@ -182,25 +150,20 @@ export function CardPageTransition() {
       if (reducedMotion) return;
 
       event.preventDefault();
-      sourceElement.current = getSourceElement(anchor);
-      sourceElement.current.classList.add("card-transition-source");
-      setImageUrl(collectTransitionImage(sourceElement.current));
+      setDirection(getNavigationDirection(url.pathname));
       phaseRef.current = "covering";
       setPhase("covering");
 
       navigationTimer.current = setTimeout(() => {
         router.push(`${url.pathname}${url.search}${url.hash}`);
-      }, compactMotion ? 330 : 430);
+      }, compactMotion ? 230 : 310);
 
       recoveryTimer.current = setTimeout(() => {
-        sourceElement.current?.classList.remove("card-transition-source");
-        sourceElement.current = null;
-        setImageUrl(null);
         navigationTimer.current = null;
         recoveryTimer.current = null;
         phaseRef.current = "idle";
         setPhase("idle");
-      }, 1900);
+      }, 1200);
     }
 
     document.addEventListener("click", handleNavigation, true);
@@ -210,22 +173,24 @@ export function CardPageTransition() {
       if (recoveryTimer.current) clearTimeout(recoveryTimer.current);
       navigationTimer.current = null;
       recoveryTimer.current = null;
-      sourceElement.current?.classList.remove("card-transition-source");
     };
   }, [compactMotion, reducedMotion, router]);
 
-  const coverDuration = compactMotion ? 0.4 : 0.52;
-  const revealDuration = compactMotion ? 0.32 : 0.46;
+  const stripCount = compactMotion ? mobileStripCount : desktopStripCount;
+  const strips = Array.from({ length: stripCount }, (_, index) => index);
+  const enterOrigin = direction === "forward" ? "top center" : "bottom center";
+  const exitOrigin = direction === "forward" ? "bottom center" : "top center";
 
   return (
     <AnimatePresence>
       {phase !== "idle" ? (
         <motion.div
           className="card-transition-layer"
+          data-direction={direction}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: phase === "revealing" ? 0.14 : 0.12 }}
+          transition={{ duration: phase === "revealing" ? 0.16 : 0.12 }}
           aria-hidden="true"
         >
           <motion.div
@@ -236,49 +201,63 @@ export function CardPageTransition() {
           />
 
           <div className="card-transition-stage">
-            {panels.map((panel) => {
-              const isMedia = panel.key === "media" && imageUrl;
+            <div className="card-transition-strip-field">
+              {strips.map((index) => {
+                const waveIndex = direction === "forward" ? index : stripCount - 1 - index;
 
-              return (
-                <motion.div
-                  key={panel.key}
-                  className={`card-transition-panel ${panel.className} ${isMedia ? "card-transition-panel-has-image" : ""}`}
-                  initial={panel.initial}
-                  animate={phase === "covering" ? panel.cover : panel.reveal}
-                  transition={{
-                    duration: phase === "covering" ? coverDuration : revealDuration,
-                    delay: phase === "covering" ? panel.delay : Math.max(0, 0.12 - panel.delay),
-                    ease: [0.2, 0.82, 0.24, 1]
-                  }}
-                >
-                  {isMedia ? (
-                    <span
-                      className="card-transition-image"
-                      style={{ backgroundImage: `url("${imageUrl.replace(/"/g, "%22")}")` }}
-                    />
-                  ) : null}
-                </motion.div>
-              );
-            })}
-
+                return (
+                  <motion.span
+                    key={index}
+                    className="card-transition-strip"
+                    style={{
+                      left: `${(index / stripCount) * 100}%`,
+                      width: `calc(${100 / stripCount}% + 2px)`,
+                      background: stripPalette[index % stripPalette.length],
+                      transformOrigin: phase === "covering" ? enterOrigin : exitOrigin
+                    }}
+                    initial={{ scaleY: 0, opacity: 0 }}
+                    animate={
+                      phase === "covering"
+                        ? { scaleY: 1, opacity: 0.95 }
+                        : { scaleY: 0, opacity: 0 }
+                    }
+                    transition={{
+                      duration: phase === "covering" ? (compactMotion ? 0.3 : 0.38) : 0.24,
+                      delay: phase === "covering" ? waveIndex * (compactMotion ? 0.012 : 0.016) : waveIndex * 0.006,
+                      ease: [0.2, 0.82, 0.24, 1]
+                    }}
+                  />
+                );
+              })}
+            </div>
+            <motion.div
+              className="card-transition-glow"
+              initial={{ opacity: 0, scale: 0.82 }}
+              animate={
+                phase === "covering"
+                  ? { opacity: 1, scale: 1 }
+                  : { opacity: 0, scale: 1.08 }
+              }
+              transition={{ duration: phase === "covering" ? 0.26 : 0.18, ease: [0.2, 0.82, 0.24, 1] }}
+            />
             <div className="card-transition-brand-anchor">
               <motion.div
                 className="card-transition-brand"
-                initial={{ opacity: 0, y: 18, scale: 0.96 }}
+                initial={{ opacity: 0, y: 14, scale: 0.96, filter: "blur(8px)" }}
                 animate={
                   phase === "covering"
-                    ? { opacity: 1, y: 0, scale: 1 }
-                    : { opacity: 0, y: -22, scale: 0.98 }
+                    ? { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }
+                    : { opacity: 0, y: -12, scale: 0.985, filter: "blur(8px)" }
                 }
                 transition={{
-                  duration: phase === "covering" ? 0.34 : 0.2,
-                  delay: phase === "covering" ? 0.13 : 0,
+                  duration: phase === "covering" ? 0.24 : 0.16,
+                  delay: phase === "covering" ? 0.04 : 0,
                   ease: [0.2, 0.82, 0.24, 1]
                 }}
               >
                 <span>SA</span>
                 <strong>Sneakers Addict</strong>
-                <small>Private catalogue</small>
+                <small>Catalogue privé</small>
               </motion.div>
             </div>
           </div>

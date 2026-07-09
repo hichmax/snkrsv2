@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, MoveRight, ShieldCheck, Sparkles, Zap } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { EditorialCard } from "@/components/site/editorial-card";
 import { Marquee } from "@/components/site/marquee";
 import { MotionReveal } from "@/components/site/motion-reveal";
@@ -74,7 +74,7 @@ export default async function HomePage() {
               <div className="mt-8 flex flex-col gap-5 border-t border-white/15 pt-5 md:flex-row md:items-center md:justify-between">
                 <p className="max-w-xl text-sm leading-6 text-white/55">
                   Des pièces fortes, des visuels nets et une commande sans friction.
-                  Le catalogue change, l'attitude reste.
+                  Le catalogue change, l&apos;attitude reste.
                 </p>
                 <Link href="#nouveautes" className="dark-pill">
                   Voir le dernier drop <ArrowUpRight className="h-4 w-4" />
@@ -117,40 +117,6 @@ export default async function HomePage() {
               sizes: product.sizes
             }))}
           />
-        </div>
-      </section>
-
-      <section className="section-shell !pb-24">
-        <div className="grid gap-px overflow-hidden rounded-[30px] border border-white/10 bg-white/10 md:grid-cols-3">
-          {[
-            {
-              icon: Zap,
-              title: "Navigation instantanée",
-              text: "Pages mises en cache, préchargement intelligent et visuels optimisés."
-            },
-            {
-              icon: Sparkles,
-              title: "Sélection vivante",
-              text: "Des nouveautés et pièces fortes ajoutées directement depuis notre studio."
-            },
-            {
-              icon: ShieldCheck,
-              title: "Commande humaine",
-              text: "Envoyez votre sélection, puis recevez disponibilité et livraison."
-            }
-          ].map((item, index) => {
-            const Icon = item.icon;
-            return (
-              <MotionReveal key={item.title} delay={index * 0.08} className="h-full">
-                <div className="h-full bg-[#0a0a0a] p-6 md:p-8">
-                  <Icon className="h-5 w-5 text-[var(--electric)]" />
-                  <h3 className="mt-10 text-xl font-semibold">{item.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-white/45">{item.text}</p>
-                  <MoveRight className="mt-8 h-5 w-5 text-white/30" />
-                </div>
-              </MotionReveal>
-            );
-          })}
         </div>
       </section>
 
