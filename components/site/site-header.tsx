@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, Check, Copy, Grid2X2, Home, Menu, Sparkles, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { playSnapCopyClick } from "@/components/site/snap-click-sound";
 
 type NavItem = {
   label: string;
@@ -34,6 +35,7 @@ export function SiteHeader({ nav }: { nav: NavItem[] }) {
   }, [pathname]);
 
   async function copySnap() {
+    void playSnapCopyClick();
     await navigator.clipboard?.writeText("snkrsaddct");
     navigator.vibrate?.(10);
     setCopied(true);
