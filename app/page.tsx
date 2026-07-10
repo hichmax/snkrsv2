@@ -58,8 +58,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="px-3 py-10 md:px-6 md:py-20">
-        <MotionReveal className="mx-auto max-w-[1500px]">
+      {false ? (
+        <section className="hidden">
+          <MotionReveal className="mx-auto max-w-[1500px]">
           <div className="statement-panel">
             <div className="statement-orbit" />
             <div className="relative z-10">
@@ -82,8 +83,9 @@ export default async function HomePage() {
               </div>
             </div>
           </div>
-        </MotionReveal>
-      </section>
+          </MotionReveal>
+        </section>
+      ) : null}
 
       <section id="nouveautes" className="section-shell">
         <div className="section-heading">
@@ -118,6 +120,33 @@ export default async function HomePage() {
             }))}
           />
         </div>
+      </section>
+
+      <section className="px-3 pb-10 pt-0 md:px-6 md:pb-20">
+        <MotionReveal className="mx-auto max-w-[1500px]">
+          <div className="statement-panel">
+            <div className="statement-orbit" />
+            <div className="relative z-10">
+              <p className="eyebrow">Sneakers Addict manifesto</p>
+              <h2 className="statement-title">
+                PAS BESOIN DE
+                <br />
+                <span>SE FONDRE</span> DANS
+                <br />
+                LA MASSE.
+              </h2>
+              <div className="mt-8 flex flex-col gap-5 border-t border-white/15 pt-5 md:flex-row md:items-center md:justify-between">
+                <p className="max-w-xl text-sm leading-6 text-white/55">
+                  Des pieces fortes, des visuels nets et une commande sans friction.
+                  Le catalogue change, l&apos;attitude reste.
+                </p>
+                <Link href="#catalogue" className="dark-pill">
+                  Revenir au catalogue <ArrowUpRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </MotionReveal>
       </section>
 
       <SiteFooter />

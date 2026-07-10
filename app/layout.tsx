@@ -6,6 +6,7 @@ import { CartOverlay } from "@/components/site/cart-overlay";
 import { siteContent } from "@/content/site-content";
 import { AnimatedBackground } from "@/components/site/animated-background";
 import { CardPageTransition } from "@/components/site/card-page-transition";
+import { SurfaceSpotlight } from "@/components/site/surface-spotlight";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -53,6 +54,7 @@ export default function RootLayout({
       <body>
         <CartProvider>
           <AnimatedBackground />
+          <SurfaceSpotlight />
           <div className="page-noise" />
           {children}
           <CartOverlay />

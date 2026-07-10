@@ -7,6 +7,7 @@ import { useCart } from "@/components/site/cart-provider";
 import { ProductTile } from "@/components/site/product-tile";
 import { ResilientImage } from "@/components/site/resilient-image";
 import { AutoFitText } from "@/components/site/auto-fit-text";
+import { TiltCard } from "@/components/site/tilt-card";
 
 type GalleryProduct = {
   id: string;
@@ -61,32 +62,37 @@ export function ProductGallery({
     <>
       <div className={modalOnly ? "interactive-product-grid" : "mobile-product-grid md:hidden"}>
         {products.map((product, index) => (
-          <motion.button
+          <motion.div
             key={product.id}
-            layoutId={`product-shell-${product.id}`}
             initial={reducedMotion ? false : { opacity: 0, scale: 0.88, y: 14 }}
             whileInView={reducedMotion ? {} : { opacity: 1, scale: 1, y: 0 }}
             viewport={{ once: true, margin: "-30px" }}
             transition={{ delay: Math.min(index * 0.025, 0.24), duration: 0.42 }}
-            whileTap={reducedMotion ? undefined : { scale: 0.93 }}
-            onClick={() => openProduct(product)}
-            className="mobile-product-thumb"
-            aria-label={`Ouvrir ${product.modelName}`}
           >
-            <motion.div layoutId={`product-image-${product.id}`} className="absolute inset-0">
-              <ResilientImage
-                src={product.imageUrl}
-                alt={product.imageAlt || product.modelName}
-                fill
-                sizes="33vw"
-                className="scale-[1.14] object-cover"
-              />
-            </motion.div>
-            <span className="mobile-product-thumb-glow" />
-            <span className="mobile-product-thumb-index">
-              {(index + 1).toString().padStart(2, "0")}
-            </span>
-          </motion.button>
+            <TiltCard fallbackActionSelector="button.mobile-product-thumb" intensity={6} lift={-5} scale={1.012}>
+              <motion.button
+                layoutId={`product-shell-${product.id}`}
+                whileTap={reducedMotion ? undefined : { scale: 0.93 }}
+                onClick={() => openProduct(product)}
+                className="mobile-product-thumb"
+                aria-label={`Ouvrir ${product.modelName}`}
+              >
+                <motion.div layoutId={`product-image-${product.id}`} className="absolute inset-0">
+                  <ResilientImage
+                    src={product.imageUrl}
+                    alt={product.imageAlt || product.modelName}
+                    fill
+                    sizes="33vw"
+                    className="scale-[1.14] object-cover"
+                  />
+                </motion.div>
+                <span className="mobile-product-thumb-glow" />
+                <span className="mobile-product-thumb-index">
+                  {(index + 1).toString().padStart(2, "0")}
+                </span>
+              </motion.button>
+            </TiltCard>
+          </motion.div>
         ))}
       </div>
 

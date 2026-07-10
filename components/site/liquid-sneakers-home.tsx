@@ -6,6 +6,7 @@ import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion
 import { useEffect, useRef, useState } from "react";
 import { LiquidGlassBackground } from "@/components/site/liquid-glass-background";
 import { SplineSneakerHero } from "@/components/site/spline-sneaker-hero";
+import { TiltCard } from "@/components/site/tilt-card";
 
 export type LiquidHomeCategory = {
   id: string;
@@ -126,19 +127,23 @@ export function LiquidSneakersHome({
               >
                 <Link
                   href={`/catalog/${category.slug}`}
-                  className="liquid-home-category-card"
+                  className="liquid-home-category-link block"
                   data-transition-source
                 >
-                  <span className="liquid-home-category-index">
-                    {(index + 1).toString().padStart(2, "0")}
-                  </span>
-                  <span className="min-w-0">
-                    <span className="liquid-home-category-name">{category.name}</span>
-                    <span className="liquid-home-category-meta">
-                      {category.brandCount} marques · {category.modelCount} modèles
-                    </span>
-                  </span>
-                  <ArrowUpRight className="h-4 w-4 shrink-0" />
+                  <TiltCard intensity={6} lift={-5} scale={1.012}>
+                    <div className="liquid-home-category-card">
+                      <span className="liquid-home-category-index">
+                        {(index + 1).toString().padStart(2, "0")}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="liquid-home-category-name">{category.name}</span>
+                        <span className="liquid-home-category-meta">
+                          {category.brandCount} marques · {category.modelCount} modèles
+                        </span>
+                      </span>
+                      <ArrowUpRight className="h-4 w-4 shrink-0" />
+                    </div>
+                  </TiltCard>
                 </Link>
               </motion.div>
             ))}
