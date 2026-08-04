@@ -78,7 +78,6 @@ export async function getHomeData() {
     }),
     prisma.product.findMany({
       where: { status: ProductStatus.PUBLISHED, isFeatured: true },
-      take: 4,
       orderBy: [{ updatedAt: "desc" }],
       include: {
         model: {

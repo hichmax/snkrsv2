@@ -108,7 +108,7 @@ export default async function HomePage() {
         <div className="mt-8 md:mt-10">
           <ProductGallery
             desktopColumns={4}
-            mode="cards"
+            mode="carousel"
             products={featured.map((product) => ({
               id: product.id,
               name: product.name,

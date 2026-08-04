@@ -1600,6 +1600,10 @@ a {
     display: none;
   }
 
+  .featured-carousel-track {
+    scroll-snap-type: x mandatory;
+  }
+
   .premium-tilt-surface,
   .premium-tilt-card[data-tilt-active="true"] .premium-tilt-surface,
   .premium-tilt-card[data-tilt-ready="true"] :is(.editorial-card-caption, .editorial-card-icon, .product-card-badge, .product-card-size-panel, .product-card-info, .mobile-product-thumb-index, .liquid-home-category-card > *) {
@@ -2106,6 +2110,72 @@ a {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(6px, 1vw, 12px);
+}
+
+.featured-carousel-shell {
+  position: relative;
+  isolation: isolate;
+  margin: -28px -4px -48px;
+  padding-block: 28px 48px;
+}
+
+.featured-carousel-shell::before,
+.featured-carousel-shell::after {
+  pointer-events: none;
+  content: "";
+  position: absolute;
+  z-index: 3;
+  top: 28px;
+  bottom: 48px;
+  width: clamp(26px, 5vw, 96px);
+}
+
+.featured-carousel-shell::before {
+  left: -1px;
+  background: linear-gradient(90deg, rgba(2, 6, 14, 0.98), rgba(2, 6, 14, 0));
+}
+
+.featured-carousel-shell::after {
+  right: -1px;
+  background: linear-gradient(270deg, rgba(2, 6, 14, 0.98), rgba(2, 6, 14, 0));
+}
+
+.featured-carousel-track {
+  display: flex;
+  gap: clamp(12px, 1.6vw, 20px);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  margin-block: -30px -78px;
+  padding: 30px 4px 78px;
+  cursor: grab;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.featured-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.featured-carousel-track[data-dragging="true"] {
+  cursor: grabbing;
+  scroll-snap-type: none;
+}
+
+.featured-carousel-track[data-dragging="true"] * {
+  cursor: grabbing;
+}
+
+.featured-carousel-slide {
+  flex: 0 0 min(78vw, 318px);
+  max-width: min(78vw, 318px);
+  scroll-snap-align: start;
+}
+
+.featured-carousel-slide,
+.featured-carousel-slide * {
+  -webkit-user-drag: none;
 }
 
 .mobile-product-thumb {
@@ -3337,6 +3407,19 @@ a {
     display: none;
   }
 
+  .featured-carousel-shell {
+    margin-inline: -8px;
+  }
+
+  .featured-carousel-track {
+    padding-inline: 8px;
+  }
+
+  .featured-carousel-slide {
+    flex-basis: min(43vw, 340px);
+    max-width: min(43vw, 340px);
+  }
+
   .interactive-product-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -3347,6 +3430,11 @@ a {
 }
 
 @media (min-width: 1280px) {
+  .featured-carousel-slide {
+    flex-basis: clamp(280px, 22vw, 360px);
+    max-width: clamp(280px, 22vw, 360px);
+  }
+
   .interactive-product-grid {
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }

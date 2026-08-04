@@ -2,7 +2,15 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, ShoppingBag, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent,
+  type WheelEvent
+} from "react";
 import { useCart } from "@/components/site/cart-provider";
 import { ProductTile } from "@/components/site/product-tile";
 import { ResilientImage } from "@/components/site/resilient-image";
@@ -31,7 +39,7 @@ export function ProductGallery({
 }: {
   products: GalleryProduct[];
   desktopColumns?: 3 | 4;
-  mode?: "responsive" | "modal" | "cards";
+  mode?: "responsive" | "modal" | "cards" | "carousel";
 }) {
   const reducedMotion = useReducedMotion();
   const { addItem } = useCart();
@@ -39,6 +47,7 @@ export function ProductGallery({
   const [selectedSize, setSelectedSize] = useState<string | undefined>();
   const modalOnly = mode === "modal";
   const cardsOnly = mode === "cards";
+  const carouselOnly = mode === "carousel";
 
   useEffect(() => {
     if (!selected) return;
@@ -61,7 +70,7 @@ export function ProductGallery({
 
   return (
     <>
-      {!cardsOnly ? (
+      {!cardsOnly && !carouselOnly ? (
         <div className={modalOnly ? "interactive-product-grid" : "mobile-product-grid md:hidden"}>
           {products.map((product, index) => (
             <motion.div
@@ -99,7 +108,9 @@ export function ProductGallery({
         </div>
       ) : null}
 
-      {!modalOnly ? (
+      {carouselOnly ? (
+        <FeaturedProductsCarousel products={products} />
+      ) : !modalOnly ? (
         <div
           className={`${cardsOnly ? "grid" : "hidden md:grid"} gap-4 ${
             desktopColumns === 4
@@ -233,4 +244,214 @@ export function ProductGallery({
       </AnimatePresence>
     </>
   );
+}
+
+function FeaturedProductsCarousel({ products }: { products: GalleryProduct[] }) {
+  const reducedMotion = useReducedMotion();
+  const trackRef = useRef<HTMLDivElement>(null);
+  const pausedRef = useRef(false);
+  const hoveringRef = useRef(false);
+  const draggingRef = useRef(false);
+  const suppressClickRef = useRef(false);
+  const pointerIdRef = useRef<number | null>(null);
+  const dragRef = useRef({ moved: false, scrollLeft: 0, x: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+
+  const loopedProducts = useMemo(
+    () => (products.length > 1 ? [...products, ...products] : products),
+    [products]
+  );
+
+  useEffect(() => {
+    pausedRef.current = Boolean(reducedMotion) || products.length < 2;
+  }, [products.length, reducedMotion]);
+
+  useEffect(() => {
+    if (reducedMotion || products.length < 2) return;
+
+    let frame = 0;
+    let last = window.performance.now();
+
+    const tick = (time: number) => {
+      const track = trackRef.current;
+      const delta = Math.min(time - last, 42);
+      last = time;
+
+      if (track && !pausedRef.current && document.visibilityState !== "hidden") {
+        track.scrollLeft += delta * 0.048;
+        normalizeLoop(track, products.length);
+      }
+
+      frame = window.requestAnimationFrame(tick);
+    };
+
+    frame = window.requestAnimationFrame(tick);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, [products.length, reducedMotion]);
+
+  useEffect(() => {
+    if (reducedMotion || products.length < 2) return;
+
+    function handleWindowPointerMove(event: globalThis.PointerEvent) {
+      const track = trackRef.current;
+      if (!track || draggingRef.current || !hoveringRef.current) return;
+
+      const rect = track.getBoundingClientRect();
+      const isInside =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom;
+
+      if (!isInside) {
+        hoveringRef.current = false;
+        updatePaused(false);
+      }
+    }
+
+    window.addEventListener("pointermove", handleWindowPointerMove, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", handleWindowPointerMove);
+    };
+  }, [products.length, reducedMotion]);
+
+  if (!products.length) return null;
+
+  function updatePaused(nextPaused: boolean) {
+    pausedRef.current = nextPaused || Boolean(reducedMotion) || products.length < 2;
+  }
+
+  function handlePointerEnter() {
+    hoveringRef.current = true;
+    updatePaused(true);
+  }
+
+  function handlePointerLeave() {
+    hoveringRef.current = false;
+    if (!draggingRef.current) updatePaused(false);
+  }
+
+  function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+
+    const track = trackRef.current;
+    if (!track) return;
+
+    draggingRef.current = true;
+    pointerIdRef.current = event.pointerId;
+    suppressClickRef.current = false;
+    dragRef.current = { moved: false, scrollLeft: track.scrollLeft, x: event.clientX };
+    setIsDragging(true);
+    updatePaused(true);
+
+    try {
+      track.setPointerCapture(event.pointerId);
+    } catch {
+      pointerIdRef.current = null;
+    }
+  }
+
+  function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
+    if (!draggingRef.current) return;
+
+    const track = trackRef.current;
+    if (!track) return;
+
+    const delta = event.clientX - dragRef.current.x;
+    if (Math.abs(delta) > 5) {
+      dragRef.current.moved = true;
+      suppressClickRef.current = true;
+    }
+
+    track.scrollLeft = dragRef.current.scrollLeft - delta;
+    normalizeLoop(track, products.length);
+  }
+
+  function finishDrag(event?: PointerEvent<HTMLDivElement>) {
+    if (!draggingRef.current) return;
+
+    const track = trackRef.current;
+    const pointerId = pointerIdRef.current;
+
+    draggingRef.current = false;
+    pointerIdRef.current = null;
+    setIsDragging(false);
+
+    if (track && pointerId !== null) {
+      try {
+        track.releasePointerCapture(pointerId);
+      } catch {
+        // Capture may already be released by the browser.
+      }
+    }
+
+    if (track && event) {
+      const rect = track.getBoundingClientRect();
+      hoveringRef.current =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom;
+    }
+
+    window.setTimeout(() => {
+      suppressClickRef.current = false;
+    }, 140);
+
+    updatePaused(hoveringRef.current);
+  }
+
+  function handleClickCapture(event: ReactMouseEvent<HTMLDivElement>) {
+    if (!suppressClickRef.current) return;
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  function handleWheel(event: WheelEvent<HTMLDivElement>) {
+    if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+      event.preventDefault();
+    }
+  }
+
+  return (
+    <div className="featured-carousel-shell">
+      <div
+        ref={trackRef}
+        className="featured-carousel-track"
+        data-dragging={isDragging ? "true" : undefined}
+        role="region"
+        aria-label="Articles du drop du moment"
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={finishDrag}
+        onPointerCancel={finishDrag}
+        onClickCapture={handleClickCapture}
+        onWheel={handleWheel}
+      >
+        {loopedProducts.map((product, index) => (
+          <div className="featured-carousel-slide" key={`${product.id}-${index}`}>
+            <ProductTile product={product} index={index % products.length} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function normalizeLoop(track: HTMLDivElement, productCount: number) {
+  if (productCount < 2) return;
+
+  const loopWidth = track.scrollWidth / 2;
+  if (!loopWidth) return;
+
+  if (track.scrollLeft >= loopWidth) {
+    track.scrollLeft -= loopWidth;
+  } else if (track.scrollLeft <= 0) {
+    track.scrollLeft += loopWidth;
+  }
 }
