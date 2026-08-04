@@ -249,12 +249,20 @@ export function ProductGallery({
 function FeaturedProductsCarousel({ products }: { products: GalleryProduct[] }) {
   const reducedMotion = useReducedMotion();
   const trackRef = useRef<HTMLDivElement>(null);
-  const pausedRef = useRef(false);
   const hoveringRef = useRef(false);
   const draggingRef = useRef(false);
+  const settlingRef = useRef(false);
+  const velocityRef = useRef(AUTO_SCROLL_VELOCITY);
+  const positionRef = useRef(0);
+  const loopWidthRef = useRef(0);
   const suppressClickRef = useRef(false);
   const pointerIdRef = useRef<number | null>(null);
-  const dragRef = useRef({ moved: false, scrollLeft: 0, x: 0 });
+  const dragRef = useRef({
+    lastTime: 0,
+    lastX: 0,
+    moved: false,
+    startX: 0
+  });
   const [isDragging, setIsDragging] = useState(false);
 
   const loopedProducts = useMemo(
@@ -263,23 +271,44 @@ function FeaturedProductsCarousel({ products }: { products: GalleryProduct[] }) 
   );
 
   useEffect(() => {
-    pausedRef.current = Boolean(reducedMotion) || products.length < 2;
-  }, [products.length, reducedMotion]);
-
-  useEffect(() => {
     if (reducedMotion || products.length < 2) return;
 
     let frame = 0;
     let last = window.performance.now();
+    velocityRef.current = AUTO_SCROLL_VELOCITY;
 
     const tick = (time: number) => {
       const track = trackRef.current;
-      const delta = Math.min(time - last, 42);
+      const delta = Math.min(time - last, 100);
       last = time;
 
-      if (track && !pausedRef.current && document.visibilityState !== "hidden") {
-        track.scrollLeft += delta * 0.048;
-        normalizeLoop(track, products.length);
+      if (track && !draggingRef.current && document.visibilityState !== "hidden") {
+        const isHovered = hoveringRef.current;
+        const targetVelocity = isHovered ? 0 : AUTO_SCROLL_VELOCITY;
+        const response = settlingRef.current
+          ? INERTIA_RESPONSE_MS
+          : isHovered
+            ? HOVER_STOP_RESPONSE_MS
+            : AUTO_RESUME_RESPONSE_MS;
+
+        velocityRef.current = dampVelocity(
+          velocityRef.current,
+          targetVelocity,
+          delta,
+          response
+        );
+
+        if (settlingRef.current && Math.abs(velocityRef.current - targetVelocity) < 0.008) {
+          settlingRef.current = false;
+        }
+
+        if (Math.abs(velocityRef.current) > 0.0005) {
+          positionRef.current = normalizeCarouselPosition(
+            positionRef.current + velocityRef.current * delta,
+            loopWidthRef.current
+          );
+          track.scrollLeft = positionRef.current;
+        }
       }
 
       frame = window.requestAnimationFrame(tick);
@@ -293,45 +322,36 @@ function FeaturedProductsCarousel({ products }: { products: GalleryProduct[] }) 
   }, [products.length, reducedMotion]);
 
   useEffect(() => {
-    if (reducedMotion || products.length < 2) return;
+    const track = trackRef.current;
+    if (!track || products.length < 2) return;
 
-    function handleWindowPointerMove(event: globalThis.PointerEvent) {
-      const track = trackRef.current;
-      if (!track || draggingRef.current || !hoveringRef.current) return;
-
-      const rect = track.getBoundingClientRect();
-      const isInside =
-        event.clientX >= rect.left &&
-        event.clientX <= rect.right &&
-        event.clientY >= rect.top &&
-        event.clientY <= rect.bottom;
-
-      if (!isInside) {
-        hoveringRef.current = false;
-        updatePaused(false);
-      }
-    }
-
-    window.addEventListener("pointermove", handleWindowPointerMove, { passive: true });
-    return () => {
-      window.removeEventListener("pointermove", handleWindowPointerMove);
+    const syncCarouselMetrics = () => {
+      loopWidthRef.current = getCarouselLoopWidth(track, products.length);
+      positionRef.current = normalizeCarouselPosition(
+        track.scrollLeft,
+        loopWidthRef.current
+      );
+      track.scrollLeft = positionRef.current;
     };
-  }, [products.length, reducedMotion]);
+
+    syncCarouselMetrics();
+
+    const resizeObserver = new ResizeObserver(syncCarouselMetrics);
+    resizeObserver.observe(track);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [products.length]);
 
   if (!products.length) return null;
 
-  function updatePaused(nextPaused: boolean) {
-    pausedRef.current = nextPaused || Boolean(reducedMotion) || products.length < 2;
-  }
-
-  function handlePointerEnter() {
+  function handleMouseEnter() {
     hoveringRef.current = true;
-    updatePaused(true);
   }
 
-  function handlePointerLeave() {
+  function handleMouseLeave() {
     hoveringRef.current = false;
-    if (!draggingRef.current) updatePaused(false);
   }
 
   function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
@@ -340,12 +360,23 @@ function FeaturedProductsCarousel({ products }: { products: GalleryProduct[] }) 
     const track = trackRef.current;
     if (!track) return;
 
+    if (event.pointerType === "touch") {
+      hoveringRef.current = false;
+    }
+
     draggingRef.current = true;
+    settlingRef.current = false;
     pointerIdRef.current = event.pointerId;
     suppressClickRef.current = false;
-    dragRef.current = { moved: false, scrollLeft: track.scrollLeft, x: event.clientX };
+    velocityRef.current = 0;
+    positionRef.current = track.scrollLeft;
+    dragRef.current = {
+      lastTime: event.timeStamp,
+      lastX: event.clientX,
+      moved: false,
+      startX: event.clientX
+    };
     setIsDragging(true);
-    updatePaused(true);
 
     try {
       track.setPointerCapture(event.pointerId);
@@ -360,14 +391,29 @@ function FeaturedProductsCarousel({ products }: { products: GalleryProduct[] }) 
     const track = trackRef.current;
     if (!track) return;
 
-    const delta = event.clientX - dragRef.current.x;
-    if (Math.abs(delta) > 5) {
+    const drag = dragRef.current;
+    const pointerDelta = drag.lastX - event.clientX;
+    const elapsed = Math.max(event.timeStamp - drag.lastTime, 1);
+
+    if (Math.abs(event.clientX - drag.startX) > 5) {
       dragRef.current.moved = true;
       suppressClickRef.current = true;
     }
 
-    track.scrollLeft = dragRef.current.scrollLeft - delta;
-    normalizeLoop(track, products.length);
+    positionRef.current = normalizeCarouselPosition(
+      positionRef.current + pointerDelta,
+      loopWidthRef.current
+    );
+    track.scrollLeft = positionRef.current;
+
+    const sampledVelocity = clamp(
+      pointerDelta / elapsed,
+      -MAX_FLING_VELOCITY,
+      MAX_FLING_VELOCITY
+    );
+    velocityRef.current = velocityRef.current * 0.3 + sampledVelocity * 0.7;
+    dragRef.current.lastX = event.clientX;
+    dragRef.current.lastTime = event.timeStamp;
   }
 
   function finishDrag(event?: PointerEvent<HTMLDivElement>) {
@@ -380,6 +426,15 @@ function FeaturedProductsCarousel({ products }: { products: GalleryProduct[] }) 
     pointerIdRef.current = null;
     setIsDragging(false);
 
+    if (event && dragRef.current.moved) {
+      const idleTime = Math.max(event.timeStamp - dragRef.current.lastTime, 0);
+      velocityRef.current *= Math.exp(-idleTime / 110);
+      settlingRef.current = true;
+    } else {
+      velocityRef.current = hoveringRef.current ? 0 : AUTO_SCROLL_VELOCITY;
+      settlingRef.current = false;
+    }
+
     if (track && pointerId !== null) {
       try {
         track.releasePointerCapture(pointerId);
@@ -388,20 +443,9 @@ function FeaturedProductsCarousel({ products }: { products: GalleryProduct[] }) 
       }
     }
 
-    if (track && event) {
-      const rect = track.getBoundingClientRect();
-      hoveringRef.current =
-        event.clientX >= rect.left &&
-        event.clientX <= rect.right &&
-        event.clientY >= rect.top &&
-        event.clientY <= rect.bottom;
-    }
-
     window.setTimeout(() => {
       suppressClickRef.current = false;
     }, 140);
-
-    updatePaused(hoveringRef.current);
   }
 
   function handleClickCapture(event: ReactMouseEvent<HTMLDivElement>) {
@@ -424,8 +468,8 @@ function FeaturedProductsCarousel({ products }: { products: GalleryProduct[] }) 
         data-dragging={isDragging ? "true" : undefined}
         role="region"
         aria-label="Articles du drop du moment"
-        onPointerEnter={handlePointerEnter}
-        onPointerLeave={handlePointerLeave}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={finishDrag}
@@ -443,15 +487,30 @@ function FeaturedProductsCarousel({ products }: { products: GalleryProduct[] }) 
   );
 }
 
-function normalizeLoop(track: HTMLDivElement, productCount: number) {
-  if (productCount < 2) return;
+const AUTO_SCROLL_VELOCITY = 0.048;
+const MAX_FLING_VELOCITY = 1.35;
+const INERTIA_RESPONSE_MS = 620;
+const HOVER_STOP_RESPONSE_MS = 130;
+const AUTO_RESUME_RESPONSE_MS = 420;
 
-  const loopWidth = track.scrollWidth / 2;
-  if (!loopWidth) return;
+function dampVelocity(current: number, target: number, delta: number, response: number) {
+  return current + (target - current) * (1 - Math.exp(-delta / response));
+}
 
-  if (track.scrollLeft >= loopWidth) {
-    track.scrollLeft -= loopWidth;
-  } else if (track.scrollLeft <= 0) {
-    track.scrollLeft += loopWidth;
-  }
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function getCarouselLoopWidth(track: HTMLDivElement, productCount: number) {
+  const slides = track.querySelectorAll<HTMLElement>(".featured-carousel-slide");
+  const firstSlide = slides[0];
+  const duplicateStart = slides[productCount];
+
+  if (!firstSlide || !duplicateStart) return track.scrollWidth / 2;
+  return duplicateStart.offsetLeft - firstSlide.offsetLeft;
+}
+
+function normalizeCarouselPosition(position: number, loopWidth: number) {
+  if (!loopWidth) return Math.max(position, 0);
+  return ((position % loopWidth) + loopWidth) % loopWidth;
 }

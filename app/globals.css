@@ -2149,7 +2149,7 @@ a {
   padding: 30px 4px 78px;
   cursor: grab;
   scrollbar-width: none;
-  scroll-snap-type: x proximity;
+  scroll-snap-type: none;
   touch-action: pan-y;
   user-select: none;
 }
