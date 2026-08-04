@@ -31,13 +31,14 @@ export function ProductGallery({
 }: {
   products: GalleryProduct[];
   desktopColumns?: 3 | 4;
-  mode?: "responsive" | "modal";
+  mode?: "responsive" | "modal" | "cards";
 }) {
   const reducedMotion = useReducedMotion();
   const { addItem } = useCart();
   const [selected, setSelected] = useState<GalleryProduct | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | undefined>();
   const modalOnly = mode === "modal";
+  const cardsOnly = mode === "cards";
 
   useEffect(() => {
     if (!selected) return;
@@ -60,46 +61,50 @@ export function ProductGallery({
 
   return (
     <>
-      <div className={modalOnly ? "interactive-product-grid" : "mobile-product-grid md:hidden"}>
-        {products.map((product, index) => (
-          <motion.div
-            key={product.id}
-            initial={reducedMotion ? false : { opacity: 0, scale: 0.88, y: 14 }}
-            whileInView={reducedMotion ? {} : { opacity: 1, scale: 1, y: 0 }}
-            viewport={{ once: true, margin: "-30px" }}
-            transition={{ delay: Math.min(index * 0.025, 0.24), duration: 0.42 }}
-          >
-            <TiltCard fallbackActionSelector="button.mobile-product-thumb" intensity={6} lift={-5} scale={1.012}>
-              <motion.button
-                layoutId={`product-shell-${product.id}`}
-                whileTap={reducedMotion ? undefined : { scale: 0.93 }}
-                onClick={() => openProduct(product)}
-                className="mobile-product-thumb"
-                aria-label={`Ouvrir ${product.modelName}`}
-              >
-                <motion.div layoutId={`product-image-${product.id}`} className="absolute inset-0">
-                  <ResilientImage
-                    src={product.imageUrl}
-                    alt={product.imageAlt || product.modelName}
-                    fill
-                    sizes="33vw"
-                    className="scale-[1.14] object-cover"
-                  />
-                </motion.div>
-                <span className="mobile-product-thumb-glow" />
-                <span className="mobile-product-thumb-index">
-                  {(index + 1).toString().padStart(2, "0")}
-                </span>
-              </motion.button>
-            </TiltCard>
-          </motion.div>
-        ))}
-      </div>
+      {!cardsOnly ? (
+        <div className={modalOnly ? "interactive-product-grid" : "mobile-product-grid md:hidden"}>
+          {products.map((product, index) => (
+            <motion.div
+              key={product.id}
+              initial={reducedMotion ? false : { opacity: 0, scale: 0.88, y: 14 }}
+              whileInView={reducedMotion ? {} : { opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: true, margin: "-30px" }}
+              transition={{ delay: Math.min(index * 0.025, 0.24), duration: 0.42 }}
+            >
+              <TiltCard fallbackActionSelector="button.mobile-product-thumb" intensity={6} lift={-5} scale={1.012}>
+                <motion.button
+                  layoutId={`product-shell-${product.id}`}
+                  whileTap={reducedMotion ? undefined : { scale: 0.93 }}
+                  onClick={() => openProduct(product)}
+                  className="mobile-product-thumb"
+                  aria-label={`Ouvrir ${product.modelName}`}
+                >
+                  <motion.div layoutId={`product-image-${product.id}`} className="absolute inset-0">
+                    <ResilientImage
+                      src={product.imageUrl}
+                      alt={product.imageAlt || product.modelName}
+                      fill
+                      sizes="33vw"
+                      className="scale-[1.14] object-cover"
+                    />
+                  </motion.div>
+                  <span className="mobile-product-thumb-glow" />
+                  <span className="mobile-product-thumb-index">
+                    {(index + 1).toString().padStart(2, "0")}
+                  </span>
+                </motion.button>
+              </TiltCard>
+            </motion.div>
+          ))}
+        </div>
+      ) : null}
 
       {!modalOnly ? (
         <div
-          className={`hidden gap-4 md:grid ${
-            desktopColumns === 4 ? "md:grid-cols-2 xl:grid-cols-4" : "md:grid-cols-2 xl:grid-cols-3"
+          className={`${cardsOnly ? "grid" : "hidden md:grid"} gap-4 ${
+            desktopColumns === 4
+              ? "sm:grid-cols-2 xl:grid-cols-4"
+              : "sm:grid-cols-2 xl:grid-cols-3"
           }`}
         >
           {products.map((product, index) => (

@@ -3333,6 +3333,10 @@ a {
 }
 
 @media (min-width: 768px) {
+  .mobile-product-grid {
+    display: none;
+  }
+
   .interactive-product-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
